@@ -1,0 +1,34 @@
+# SwarmTeam OS: Git Ignore
+
+# Secretos y Entorno
+*.env
+hermes.env
+config/*.env
+.harness_lock
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+env/
+venv/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Infra y Datos Dinámicos
+.hermes/
+app_result/
+# state.json se mantiene si se desea versionar la telemetría base, 
+# pero usualmente se ignora. Lo dejaré comentado por si quieres ignorarlo:
+# state.json
+
+# Herramientas de IDE
+.vscode/
+.idea/
+.cursor/
+
+# Logs
+*.log

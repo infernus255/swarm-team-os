@@ -1,0 +1,49 @@
+{
+  "timestamp": "2026-06-07T09:21:11.197983Z",
+  "current_environment_id": "codespaces-16ec44:host:hermes-test",
+  "environment": {
+    "environment_id": "codespaces-16ec44:host:hermes-test",
+    "environment_name": "codespaces-16ec44",
+    "user": "codespace",
+    "env_type": "host",
+    "container_id": null,
+    "path": "/workspaces/hermes-test",
+    "timestamp": "2026-06-07T07:11:00.863099Z"
+  },
+  "environments": {
+    "codespaces-16ec44:host:hermes-test": {
+      "environment": {
+        "environment_id": "codespaces-16ec44:host:hermes-test",
+        "environment_name": "codespaces-16ec44",
+        "user": "codespace",
+        "env_type": "host",
+        "path": "C:\\Users\\admin\\source\\repos\\hermes-test",
+        "timestamp": "2026-06-07T09:21:11.197983Z"
+      },
+      "hermes": {
+        "installed": true,
+        "version": "Hermes Agent v0.16.0 (2026.6.5) · upstream 210f4e70",
+        "provider": "gemini",
+        "model_default": "gemini-3.5-flash",
+        "base_url": "https://generativelanguage.googleapis.com/v1beta/openai",
+        "gateway": "telegram_not_configured"
+      },
+      "system": {
+        "os_name": "nt",
+        "os_version": "Unknown",
+        "driver_extensions": {}
+      },
+      "git": {
+        "branch": "'git' is not recognized as an internal or external command,\noperable program or batch file.",
+        "commit": "'git' is not recognized as an internal or external command,\noperable program or batch file.",
+        "message": "'git' is not recognized as an internal or external command,\noperable program or batch file.",
+        "status": {
+          "modified": 2,
+          "untracked": 2,
+          "ahead": 0,
+          "behind": 0
+        }
+      }
+    }
+  }
+}
