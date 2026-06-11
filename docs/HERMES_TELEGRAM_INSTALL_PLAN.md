@@ -262,7 +262,7 @@ hermes setup
 ## 14. Estado actual y validación
 
 ### Entorno actual
-- Environment ID: codespaces-16ec44:host:hermes-test
+- Environment ID: DESKTOP-Q0NMPDE:host:hermes-telegram-isolated-env
 - Environment type: host
 
 ### Hermes

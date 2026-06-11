@@ -1,14 +1,14 @@
 {
-  "timestamp": "2026-06-07T09:21:11.197983Z",
-  "current_environment_id": "codespaces-16ec44:host:hermes-test",
+  "timestamp": "2026-06-11T06:19:52.494609Z",
+  "current_environment_id": "DESKTOP-Q0NMPDE:host:hermes-telegram-isolated-env",
   "environment": {
-    "environment_id": "codespaces-16ec44:host:hermes-test",
-    "environment_name": "codespaces-16ec44",
-    "user": "codespace",
+    "environment_id": "DESKTOP-Q0NMPDE:host:hermes-telegram-isolated-env",
+    "environment_name": "DESKTOP-Q0NMPDE",
+    "user": "admin",
     "env_type": "host",
     "container_id": null,
-    "path": "/workspaces/hermes-test",
-    "timestamp": "2026-06-07T07:11:00.863099Z"
+    "path": "C:\\Users\\admin\\.gemini\\antigravity\\worktrees\\hermes-swarm\\hermes-telegram-isolated-env",
+    "timestamp": "2026-06-11T06:19:51.940099Z"
   },
   "environments": {
     "codespaces-16ec44:host:hermes-test": {
@@ -17,8 +17,8 @@
         "environment_name": "codespaces-16ec44",
         "user": "codespace",
         "env_type": "host",
-        "path": "C:\\Users\\admin\\source\\repos\\hermes-test",
-        "timestamp": "2026-06-07T09:21:11.197983Z"
+        "path": "C:\\Users\\admin\\.gemini\\antigravity\\worktrees\\hermes-swarm\\hermes-telegram-isolated-env",
+        "timestamp": "2026-06-11T06:13:18.106661Z"
       },
       "hermes": {
         "installed": true,
@@ -34,12 +34,46 @@
         "driver_extensions": {}
       },
       "git": {
-        "branch": "'git' is not recognized as an internal or external command,\noperable program or batch file.",
-        "commit": "'git' is not recognized as an internal or external command,\noperable program or batch file.",
-        "message": "'git' is not recognized as an internal or external command,\noperable program or batch file.",
+        "branch": "hermes-telegram-isolated-env",
+        "commit": "083c4cc0f3452f824121e94f15626ad1ffe6390c",
+        "message": "Feature: Implement Jarvis Reflection and Global Learning loop (SGA integration)",
         "status": {
-          "modified": 2,
-          "untracked": 2,
+          "modified": 7,
+          "untracked": 0,
+          "ahead": 0,
+          "behind": 0
+        }
+      }
+    },
+    "DESKTOP-Q0NMPDE:host:hermes-telegram-isolated-env": {
+      "environment": {
+        "environment_id": "DESKTOP-Q0NMPDE:host:hermes-telegram-isolated-env",
+        "environment_name": "DESKTOP-Q0NMPDE",
+        "user": "admin",
+        "env_type": "host",
+        "path": "C:\\Users\\admin\\.gemini\\antigravity\\worktrees\\hermes-swarm\\hermes-telegram-isolated-env",
+        "timestamp": "2026-06-11T06:19:52.494609Z"
+      },
+      "hermes": {
+        "installed": true,
+        "version": "Hermes Agent v0.16.0 (2026.6.5) · upstream 210f4e70",
+        "provider": "gemini",
+        "model_default": "gemini-3.5-flash",
+        "base_url": "https://generativelanguage.googleapis.com/v1beta/openai",
+        "gateway": "telegram_not_configured"
+      },
+      "system": {
+        "os_name": "nt",
+        "os_version": "Unknown",
+        "driver_extensions": {}
+      },
+      "git": {
+        "branch": "hermes-telegram-isolated-env",
+        "commit": "083c4cc0f3452f824121e94f15626ad1ffe6390c",
+        "message": "Feature: Implement Jarvis Reflection and Global Learning loop (SGA integration)",
+        "status": {
+          "modified": 10,
+          "untracked": 3,
           "ahead": 0,
           "behind": 0
         }

@@ -6,7 +6,7 @@ import re
 from utils.state_loader import StateLoader
 
 loader = StateLoader()
-REPO_ROOT = Path(__file__).resolve().parents[1]
+REPO_ROOT = loader.repo_root
 DOCKERFILE = REPO_ROOT / "Dockerfile"
 
 

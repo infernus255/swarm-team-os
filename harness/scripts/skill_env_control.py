@@ -21,8 +21,10 @@ def get_git_status(repo_root: Path) -> dict:
         branch = subprocess.getoutput("git branch --show-current").strip()
         commit_hash = subprocess.getoutput("git rev-parse HEAD").strip()
         commit_msg = subprocess.getoutput("git log -1 --pretty=%B").strip()
-        modified = len(subprocess.getoutput("git diff --name-only").splitlines())
-        untracked = len(subprocess.getoutput("git status --porcelain | grep '??'").splitlines())
+        
+        status_lines = subprocess.getoutput("git status --porcelain").splitlines()
+        untracked = sum(1 for line in status_lines if line.startswith("??"))
+        modified = sum(1 for line in status_lines if not line.startswith("??"))
         
         return {
             "branch": branch,
@@ -31,7 +33,7 @@ def get_git_status(repo_root: Path) -> dict:
             "status": {"modified": modified, "untracked": untracked, "ahead": 0, "behind": 0}
         }
     except Exception:
-        return {"branch": "unknown", "commit": "unknown"}
+        return {"branch": "unknown", "commit": "unknown", "status": {"modified": 0, "untracked": 0, "ahead": 0, "behind": 0}}
 
 
 def sync_markdown_plan(repo_root: Path, current_state: dict, env_id: str):
@@ -74,8 +76,12 @@ def main():
     state = loader.load_state()
     repo_root = loader.repo_root
     
-    env_node_id = os.getenv("AGENCY_NODE_ID", "codespaces-16ec44")
-    env_id = f"{env_node_id}:host:hermes-test"
+    env_id = state.get("current_environment_id")
+    if not env_id:
+        env_node_id = os.getenv("AGENCY_NODE_ID", "codespaces-16ec44")
+        env_id = f"{env_node_id}:host:hermes-test"
+    else:
+        env_node_id = env_id.split(":")[0]
     
     timestamp = datetime.utcnow().isoformat() + "Z"
     state["timestamp"] = timestamp
@@ -96,7 +102,7 @@ def main():
         "environment": {
             "environment_id": env_id,
             "environment_name": env_node_id,
-            "user": os.getenv("USER", "codespace"),
+            "user": os.getenv("USER") or os.getenv("USERNAME") or "codespace",
             "env_type": "host",
             "path": str(repo_root),
             "timestamp": timestamp

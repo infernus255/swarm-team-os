@@ -11,6 +11,7 @@ from pathlib import Path
 from utils.state_loader import StateLoader
 
 loader = StateLoader()
+REPO_ROOT = loader.repo_root
 DOCKER_IMAGE = "hermes-test"
 KEY_LIMITS_FILE = loader.repo_root / "api_key_limits.json"
 API_KEY_LIMITS_ENV = "API_KEY_LIMITS"
@@ -283,7 +284,11 @@ def get_git_state():
 
 
 def get_environment_metadata():
-    host_name = os.uname().nodename
+    try:
+        host_name = os.uname().nodename
+    except AttributeError:
+        import platform
+        host_name = platform.node()
     user = os.getenv("USER") or os.getenv("USERNAME") or "unknown"
     path = str(REPO_ROOT)
     in_container = False

@@ -6,7 +6,7 @@ from datetime import datetime
 from utils.state_loader import StateLoader
 
 loader = StateLoader()
-REPO_ROOT = Path(__file__).resolve().parents[1]
+REPO_ROOT = loader.repo_root
 PLAN_FILE = REPO_ROOT / "docs" / "HERMES_TELEGRAM_INSTALL_PLAN.md"
 
 STATE_BEGIN = "<!-- STATE-BEGIN -->"
@@ -112,7 +112,7 @@ def format_autorunner(state):
 
 
 def update_plan_file(state):
-    content = PLAN_FILE.read_text()
+    content = PLAN_FILE.read_text(encoding="utf-8")
     state_section = format_state(state)
     autorunner_section = format_autorunner(state)
     if STATE_BEGIN in content and STATE_END in content:
@@ -123,7 +123,7 @@ def update_plan_file(state):
         content = content.split(AUTORUNNER_BEGIN)[0] + AUTORUNNER_BEGIN + "\n" + autorunner_section + AUTORUNNER_END + content.split(AUTORUNNER_END)[1]
     else:
         content = content.rstrip() + "\n\n" + AUTORUNNER_BEGIN + "\n" + autorunner_section + AUTORUNNER_END + "\n"
-    PLAN_FILE.write_text(content)
+    PLAN_FILE.write_text(content, encoding="utf-8")
     print(f"Plan actualizado en {PLAN_FILE}")
 
 

@@ -10,7 +10,7 @@ from pathlib import Path
 from utils.state_loader import StateLoader
 
 loader = StateLoader()
-REPO_ROOT = Path(__file__).resolve().parents[1]
+REPO_ROOT = loader.repo_root
 VALIDATION_FILES = [
     "state.json",
     "memory.md",
@@ -22,8 +22,8 @@ VALIDATION_FILES = [
     "docs/N8N.md",
     "Dockerfile",
     "docker-compose.yml",
-    "docker-entrypoint.sh",
-    "hermes-install.sh",
+    "infra/hermes/docker-entrypoint.sh",
+    "infra/hermes/hermes-install.sh",
 ]
 
 
@@ -102,13 +102,32 @@ def validate_copilot_docs():
 def validate_n8n():
     if not (REPO_ROOT / "docs" / "N8N.md").exists():
         return False, "Falta la documentación de n8n: docs/N8N.md"
-    if not shutil.which("n8n"):
-        return False, "n8n no está instalado o no está en el PATH"
-    if shutil.which("pgrep"):
-        proc = run(["pgrep", "-f", "n8n"], check=False)
-        if proc.returncode != 0:
-            return False, "n8n no parece estar levantado en el sistema"
-    return True, None
+    
+    # Check if n8n is running locally or in Docker
+    local_n8n = shutil.which("n8n")
+    if local_n8n:
+        if shutil.which("pgrep"):
+            proc = run(["pgrep", "-f", "n8n"], check=False)
+            if proc.returncode != 0:
+                return False, "n8n no parece estar levantado en el sistema local"
+        return True, None
+        
+    # If not local, check if running in docker
+    if shutil.which("docker"):
+        try:
+            # Check if n8n service is running or configured in docker compose
+            config_proc = run(["docker", "compose", "config", "--services"], check=False)
+            if config_proc.returncode == 0 and "n8n" in config_proc.stdout.splitlines():
+                ps_proc = run(["docker", "compose", "ps"], check=False)
+                if ps_proc.returncode == 0 and "n8n" in ps_proc.stdout.lower():
+                    # Check if status indicates it is up/running
+                    if any(status in ps_proc.stdout.lower() for status in ["up", "running", "running (healthy)"]):
+                        return True, None
+                return False, "n8n está configurado en docker-compose, pero el contenedor no está iniciado (ejecuta docker compose up -d)"
+        except Exception as exc:
+            return False, f"Error al verificar n8n en Docker: {exc}"
+            
+    return False, "n8n no está instalado en el PATH local ni corriendo en Docker"
 
 
 def validate_api_keys(state):
@@ -145,65 +164,61 @@ def git_add_commit_push(message):
 
 
 def main():
-    loader.acquire_lock()
-    try:
-        state, err = load_state()
-        if err:
-            print(err)
-            sys.exit(1)
+    state, err = load_state()
+    if err:
+        print(err)
+        sys.exit(1)
 
-        print("Validando archivos de documentación...")
-        errors = []
-        for path in VALIDATION_FILES:
-            ok, msg = validate_file(path)
-            if not ok:
-                errors.append(msg)
-
-        print("Validando estado del sistema operativo...")
-        ok, msg = validate_os(state)
+    print("Validando archivos de documentación...")
+    errors = []
+    for path in VALIDATION_FILES:
+        ok, msg = validate_file(path)
         if not ok:
             errors.append(msg)
 
-        print("Validando Hermes...")
-        ok, msg = validate_hermes(state)
-        if not ok:
-            errors.append(msg)
+    print("Validando estado del sistema operativo...")
+    ok, msg = validate_os(state)
+    if not ok:
+        errors.append(msg)
 
-        print("Validando documentación de Copilot...")
-        ok, msg = validate_copilot_docs()
-        if not ok:
-            errors.append(msg)
+    print("Validando Hermes...")
+    ok, msg = validate_hermes(state)
+    if not ok:
+        errors.append(msg)
 
-        print("Validando claves API y límites...")
-        ok, msg = validate_api_keys(state)
-        if not ok:
-            errors.append(msg)
+    print("Validando documentación de Copilot...")
+    ok, msg = validate_copilot_docs()
+    if not ok:
+        errors.append(msg)
 
-        print("Validando n8n...")
-        ok, msg = validate_n8n()
-        if not ok:
-            errors.append(msg)
+    print("Validando claves API y límites...")
+    ok, msg = validate_api_keys(state)
+    if not ok:
+        errors.append(msg)
 
-        print("Validando Docker...")
-        ok, msg = validate_docker()
-        if not ok:
-            errors.append(msg)
+    print("Validando n8n...")
+    ok, msg = validate_n8n()
+    if not ok:
+        errors.append(msg)
 
-        if errors:
-            print("\nValidación fallida con los siguientes errores:")
-            for item in errors:
-                print(f"- {item}")
-            sys.exit(1)
+    print("Validando Docker...")
+    ok, msg = validate_docker()
+    if not ok:
+        errors.append(msg)
 
-        commit_message = "Auto commit: validate state/docs/hermes/copilot/n8n/docker and push"
-        if len(sys.argv) > 1:
-            commit_message = " ".join(sys.argv[1:])
+    if errors:
+        print("\nValidación fallida con los siguientes errores:")
+        for item in errors:
+            print(f"- {item}")
+        sys.exit(1)
 
-        print("Todas las validaciones pasaron. Commit y push en progreso...")
-        git_add_commit_push(commit_message)
-        print("Commit y push completados.")
-    finally:
-        loader.release_lock()
+    commit_message = "Auto commit: validate state/docs/hermes/copilot/n8n/docker and push"
+    if len(sys.argv) > 1:
+        commit_message = " ".join(sys.argv[1:])
+
+    print("Todas las validaciones pasaron. Commit y push en progreso...")
+    git_add_commit_push(commit_message)
+    print("Commit y push completados.")
 
 
 if __name__ == "__main__":

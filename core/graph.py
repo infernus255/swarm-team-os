@@ -93,6 +93,8 @@ def qa_check_edge(state: GraphState) -> str:
     else:
         print("🛑 Límite de correcciones alcanzado. Abortando.")
         return "END"
+
+async def devops_node(state: GraphState) -> GraphState:
     print(f"--- [M6] Generando Infraestructura (Docker) ---")
     path = "app_result/deploy/Dockerfile"
     _ensure_dir(path)

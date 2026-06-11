@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -e
 
-REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+REPO_ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 MEMORY_FILE="$REPO_ROOT/memory.md"
 
 if [ $# -lt 1 ]; then
