@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-06-12T18:45:07.183282Z",
+  "timestamp": "2026-06-12T19:33:41.664710Z",
   "current_environment_id": "DESKTOP-Q0NMPDE:host:hermes-telegram-isolated-env",
   "environment": {
     "environment_id": "DESKTOP-Q0NMPDE:host:hermes-telegram-isolated-env",
@@ -8,7 +8,7 @@
     "env_type": "host",
     "container_id": null,
     "path": "C:\\Users\\admin\\.gemini\\antigravity\\worktrees\\hermes-swarm\\hermes-telegram-isolated-env",
-    "timestamp": "2026-06-12T18:45:06.464194Z"
+    "timestamp": "2026-06-12T19:33:36.791234Z"
   },
   "environments": {
     "codespaces-16ec44:host:hermes-test": {
@@ -51,12 +51,13 @@
         "environment_name": "DESKTOP-Q0NMPDE",
         "user": "admin",
         "env_type": "host",
+        "container_id": null,
         "path": "C:\\Users\\admin\\.gemini\\antigravity\\worktrees\\hermes-swarm\\hermes-telegram-isolated-env",
-        "timestamp": "2026-06-12T18:45:07.183282Z"
+        "timestamp": "2026-06-12T19:33:36.791234Z"
       },
       "hermes": {
         "installed": true,
-        "version": "Hermes Agent v0.16.0 (2026.6.5) · upstream 210f4e70",
+        "version": null,
         "provider": "gemini",
         "model_default": "gemini-3.5-flash",
         "base_url": "https://generativelanguage.googleapis.com/v1beta/openai",
@@ -65,18 +66,52 @@
       "system": {
         "os_name": "nt",
         "os_version": "Unknown",
-        "driver_extensions": {}
+        "packages_checked": [],
+        "required_packages": [
+          "curl",
+          "git",
+          "python3",
+          "python3-venv",
+          "python3-pip",
+          "npm",
+          "xz-utils",
+          "ca-certificates"
+        ]
       },
       "git": {
         "branch": "hermes-telegram-isolated-env",
-        "commit": "bcf0cd17fd0078fe025b61fc320c856b6ab8aa8b",
-        "message": "Fix: Clean up env vars in docker-compose to avoid host overrides",
+        "commit": "ba5f123fdc4a675234859f8f1f7b94431582db65",
+        "message": "Docs: Update state.json with latest timestamp and git commit",
         "status": {
-          "modified": 2,
-          "untracked": 0,
+          "modified": 6,
+          "untracked": 1,
           "ahead": 0,
           "behind": 0
         }
+      },
+      "api_keys": {
+        "summary": {
+          "total_keys": 1,
+          "providers": [
+            "GEMINI"
+          ]
+        },
+        "keys": [
+          {
+            "provider": "GEMINI",
+            "alias": "primary",
+            "key_id": "cebf3b327cd35a54",
+            "limit": 1000000,
+            "limit_source": {
+              "limit": 1000000,
+              "provider": "gemini",
+              "notes": "Primary Gemini key quota"
+            },
+            "source": "GEMINI_API_KEY",
+            "note": "Clave API principal"
+          }
+        ],
+        "limits_source": "api_key_limits.json or API_KEY_LIMITS env"
       }
     }
   }

@@ -267,15 +267,30 @@ hermes setup
 
 ### Hermes
 - Instalado: True
-- Versión: Hermes Agent v0.16.0 (2026.6.5) · upstream 210f4e70
+- Versión: None
 - Proveedor: gemini
 - Modelo por defecto: gemini-3.5-flash
 - Base URL: https://generativelanguage.googleapis.com/v1beta/openai
+- Gateway Telegram: telegram_not_configured
 
 ### Sistema operativo
 - Nombre: nt
 - Versión: Unknown
+- Paquetes verificados:
 
+### API keys
+- Total de claves detectadas: 1
+- Proveedores: GEMINI
+  - primary (GEMINI): limit=1000000, source=GEMINI_API_KEY
+
+### Repositorio git
+- Rama: hermes-telegram-isolated-env
+- Commit: ba5f123fdc4a675234859f8f1f7b94431582db65
+- Mensaje: Docs: Update state.json with latest timestamp and git commit
+- Cambios modificados: 6
+- Archivos no rastreados: 1
+- Ahead: 0
+- Behind: 0
 <!-- STATE-END -->
 
 <!-- AUTORUNNER-BEGIN -->

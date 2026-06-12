@@ -28,7 +28,7 @@ VALIDATION_FILES = [
 
 
 def run(cmd, check=True, capture_output=True):
-    return subprocess.run(cmd, check=check, capture_output=capture_output, text=True)
+    return subprocess.run(cmd, check=check, capture_output=capture_output, text=True, encoding="utf-8", errors="replace")
 
 
 def validate_file(path):

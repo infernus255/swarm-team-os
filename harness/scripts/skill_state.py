@@ -19,9 +19,9 @@ API_KEY_LIMITS_ENV = "API_KEY_LIMITS"
 
 def run_command(cmd, capture_output=True, check=False):
     try:
-        result = subprocess.run(cmd, capture_output=capture_output, text=True, check=check)
-        return result.stdout.strip()
-    except subprocess.CalledProcessError:
+        result = subprocess.run(cmd, capture_output=capture_output, text=True, check=check, encoding="utf-8", errors="replace")
+        return result.stdout.strip() if (result and result.stdout) else ""
+    except Exception:
         return ""
 
 
@@ -199,9 +199,16 @@ def get_hermes_status():
             image_list = run_command(["docker", "images", "-q", DOCKER_IMAGE])
             if image_list:
                 result["installed"] = True
+                env_args = []
+                repo_env = loader.repo_root / "hermes.env"
+                if repo_env.exists():
+                    env_data = load_env_file(repo_env)
+                    for k, v in env_data.items():
+                        env_args.extend(["-e", f"{k}={v}"])
                 config_output = run_command([
-                    "docker", "run", "--rm", "--entrypoint", "/bin/bash", DOCKER_IMAGE,
-                    "-lc", 'hermes config show'
+                    "docker", "run", "--rm"
+                ] + env_args + [
+                    DOCKER_IMAGE, "hermes", "config", "show"
                 ]) or ""
             else:
                 config_output = ""
