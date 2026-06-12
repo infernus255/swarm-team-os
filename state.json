@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-06-12T19:33:41.664710Z",
+  "timestamp": "2026-06-12T19:44:04.675116Z",
   "current_environment_id": "DESKTOP-Q0NMPDE:host:hermes-telegram-isolated-env",
   "environment": {
     "environment_id": "DESKTOP-Q0NMPDE:host:hermes-telegram-isolated-env",
@@ -8,7 +8,7 @@
     "env_type": "host",
     "container_id": null,
     "path": "C:\\Users\\admin\\.gemini\\antigravity\\worktrees\\hermes-swarm\\hermes-telegram-isolated-env",
-    "timestamp": "2026-06-12T19:33:36.791234Z"
+    "timestamp": "2026-06-12T19:43:57.983746Z"
   },
   "environments": {
     "codespaces-16ec44:host:hermes-test": {
@@ -53,7 +53,7 @@
         "env_type": "host",
         "container_id": null,
         "path": "C:\\Users\\admin\\.gemini\\antigravity\\worktrees\\hermes-swarm\\hermes-telegram-isolated-env",
-        "timestamp": "2026-06-12T19:33:36.791234Z"
+        "timestamp": "2026-06-12T19:43:57.983746Z"
       },
       "hermes": {
         "installed": true,
@@ -80,11 +80,11 @@
       },
       "git": {
         "branch": "hermes-telegram-isolated-env",
-        "commit": "ba5f123fdc4a675234859f8f1f7b94431582db65",
-        "message": "Docs: Update state.json with latest timestamp and git commit",
+        "commit": "f41c5e4c6895ce3a2f17bca256a47d9ae8ab1c71",
+        "message": "Fix: Finalize Windows/Docker environment setup, configure API key limits, and fix encoding issues",
         "status": {
-          "modified": 6,
-          "untracked": 1,
+          "modified": 0,
+          "untracked": 0,
           "ahead": 0,
           "behind": 0
         }

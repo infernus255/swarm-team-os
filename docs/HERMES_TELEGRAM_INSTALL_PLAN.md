@@ -285,10 +285,10 @@ hermes setup
 
 ### Repositorio git
 - Rama: hermes-telegram-isolated-env
-- Commit: ba5f123fdc4a675234859f8f1f7b94431582db65
-- Mensaje: Docs: Update state.json with latest timestamp and git commit
-- Cambios modificados: 6
-- Archivos no rastreados: 1
+- Commit: f41c5e4c6895ce3a2f17bca256a47d9ae8ab1c71
+- Mensaje: Fix: Finalize Windows/Docker environment setup, configure API key limits, and fix encoding issues
+- Cambios modificados: 0
+- Archivos no rastreados: 0
 - Ahead: 0
 - Behind: 0
 <!-- STATE-END -->
