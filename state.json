@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-06-11T06:19:52.494609Z",
+  "timestamp": "2026-06-12T18:45:07.183282Z",
   "current_environment_id": "DESKTOP-Q0NMPDE:host:hermes-telegram-isolated-env",
   "environment": {
     "environment_id": "DESKTOP-Q0NMPDE:host:hermes-telegram-isolated-env",
@@ -8,7 +8,7 @@
     "env_type": "host",
     "container_id": null,
     "path": "C:\\Users\\admin\\.gemini\\antigravity\\worktrees\\hermes-swarm\\hermes-telegram-isolated-env",
-    "timestamp": "2026-06-11T06:19:51.940099Z"
+    "timestamp": "2026-06-12T18:45:06.464194Z"
   },
   "environments": {
     "codespaces-16ec44:host:hermes-test": {
@@ -52,7 +52,7 @@
         "user": "admin",
         "env_type": "host",
         "path": "C:\\Users\\admin\\.gemini\\antigravity\\worktrees\\hermes-swarm\\hermes-telegram-isolated-env",
-        "timestamp": "2026-06-11T06:19:52.494609Z"
+        "timestamp": "2026-06-12T18:45:07.183282Z"
       },
       "hermes": {
         "installed": true,
@@ -69,11 +69,11 @@
       },
       "git": {
         "branch": "hermes-telegram-isolated-env",
-        "commit": "083c4cc0f3452f824121e94f15626ad1ffe6390c",
-        "message": "Feature: Implement Jarvis Reflection and Global Learning loop (SGA integration)",
+        "commit": "bcf0cd17fd0078fe025b61fc320c856b6ab8aa8b",
+        "message": "Fix: Clean up env vars in docker-compose to avoid host overrides",
         "status": {
-          "modified": 10,
-          "untracked": 3,
+          "modified": 2,
+          "untracked": 0,
           "ahead": 0,
           "behind": 0
         }
