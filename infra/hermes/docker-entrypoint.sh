@@ -7,11 +7,13 @@ if [ -z "${TELEGRAM_BOT_TOKEN}" ]; then
 fi
 
 mkdir -p /root/.hermes
+cp /app/infra/hermes/SOUL.md /root/.hermes/SOUL.md || true
 rm -f /root/.hermes/.env
 cat > /root/.hermes/.env <<EOF
 TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
 GATEWAY_ALLOW_ALL_USERS=${GATEWAY_ALLOW_ALL_USERS:-false}
 EOF
+
 
 if [ -n "${GEMINI_API_KEY}" ]; then
   CLEAN_KEY=$(echo "${GEMINI_API_KEY}" | sed -E 's/^[a-zA-Z0-9_]+://')
