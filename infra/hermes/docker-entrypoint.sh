@@ -14,7 +14,7 @@ GATEWAY_ALLOW_ALL_USERS=${GATEWAY_ALLOW_ALL_USERS:-false}
 EOF
 
 if [ -n "${GEMINI_API_KEY}" ]; then
-  CLEAN_KEY=$(echo "${GEMINI_API_KEY}" | sed -E 's/^[a-zA-Z0-9_]+:(AIzaSy[a-zA-Z0-9_-]+)/\1/')
+  CLEAN_KEY=$(echo "${GEMINI_API_KEY}" | sed -E 's/^[a-zA-Z0-9_]+://')
   echo "GEMINI_API_KEY=${CLEAN_KEY}" >> /root/.hermes/.env
 fi
 
@@ -23,7 +23,7 @@ if [ -n "${GEMINI_API_KEYS}" ]; then
 fi
 
 if [ -n "${GOOGLE_API_KEY}" ]; then
-  CLEAN_KEY=$(echo "${GOOGLE_API_KEY}" | sed -E 's/^[a-zA-Z0-9_]+:(AIzaSy[a-zA-Z0-9_-]+)/\1/')
+  CLEAN_KEY=$(echo "${GOOGLE_API_KEY}" | sed -E 's/^[a-zA-Z0-9_]+://')
   echo "GOOGLE_API_KEY=${CLEAN_KEY}" >> /root/.hermes/.env
 fi
 
@@ -44,6 +44,25 @@ chmod 600 /root/.hermes/.env
 hermes config set model.provider gemini || true
 hermes config set model.default gemini-3.5-flash || true
 hermes config set model.base_url https://generativelanguage.googleapis.com/v1beta/openai || true
+
+# Auto-configure fallback chain if not present
+/usr/local/lib/hermes-agent/venv/bin/python3 -c "
+import yaml
+path = '/root/.hermes/config.yaml'
+try:
+    with open(path) as f:
+        cfg = yaml.safe_load(f) or {}
+    if 'fallback_providers' not in cfg or not cfg['fallback_providers']:
+        cfg['fallback_providers'] = [
+            {'provider': 'gemini', 'model': 'gemini-3.1-flash-lite', 'base_url': 'https://generativelanguage.googleapis.com/v1beta/openai'},
+            {'provider': 'gemini', 'model': 'gemini-2.5-flash-lite', 'base_url': 'https://generativelanguage.googleapis.com/v1beta/openai'}
+        ]
+        with open(path, 'w') as f:
+            yaml.safe_dump(cfg, f, default_flow_style=False)
+except Exception:
+    pass
+" || true
+
 
 if [ "$#" -gt 0 ]; then
   exec "$@"

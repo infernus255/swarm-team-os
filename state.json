@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-06-13T00:50:15.475657Z",
+  "timestamp": "2026-06-13T03:58:22.945171Z",
   "current_environment_id": "DESKTOP-Q0NMPDE:host:hermes-telegram-isolated-env",
   "environment": {
     "environment_id": "DESKTOP-Q0NMPDE:host:hermes-telegram-isolated-env",
@@ -8,7 +8,7 @@
     "env_type": "host",
     "container_id": null,
     "path": "C:\\Users\\admin\\.gemini\\antigravity\\worktrees\\hermes-swarm\\hermes-telegram-isolated-env",
-    "timestamp": "2026-06-13T00:50:09.457436Z"
+    "timestamp": "2026-06-13T03:58:15.813200Z"
   },
   "environments": {
     "codespaces-16ec44:host:hermes-test": {
@@ -53,7 +53,7 @@
         "env_type": "host",
         "container_id": null,
         "path": "C:\\Users\\admin\\.gemini\\antigravity\\worktrees\\hermes-swarm\\hermes-telegram-isolated-env",
-        "timestamp": "2026-06-13T00:50:09.457436Z"
+        "timestamp": "2026-06-13T03:58:15.813200Z"
       },
       "hermes": {
         "installed": true,
@@ -80,10 +80,10 @@
       },
       "git": {
         "branch": "hermes-telegram-isolated-env",
-        "commit": "67371a5c76e913a79cb26b87cf76613810a4de4c",
-        "message": "Docs: Update state showing active Telegram Gateway",
+        "commit": "20251d02333aa10e274f14aab13f9b1b969cfabe",
+        "message": "Fix: Clean API keys from alias prefix in docker-entrypoint to resolve model provider failures",
         "status": {
-          "modified": 2,
+          "modified": 1,
           "untracked": 0,
           "ahead": 0,
           "behind": 0
@@ -100,7 +100,7 @@
           {
             "provider": "GEMINI",
             "alias": "primary",
-            "key_id": "cebf3b327cd35a54",
+            "key_id": "bbecfb04dcd925eb",
             "limit": 1000000,
             "limit_source": {
               "limit": 1000000,

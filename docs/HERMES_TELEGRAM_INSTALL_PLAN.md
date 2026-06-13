@@ -285,9 +285,9 @@ hermes setup
 
 ### Repositorio git
 - Rama: hermes-telegram-isolated-env
-- Commit: 67371a5c76e913a79cb26b87cf76613810a4de4c
-- Mensaje: Docs: Update state showing active Telegram Gateway
-- Cambios modificados: 2
+- Commit: 20251d02333aa10e274f14aab13f9b1b969cfabe
+- Mensaje: Fix: Clean API keys from alias prefix in docker-entrypoint to resolve model provider failures
+- Cambios modificados: 1
 - Archivos no rastreados: 0
 - Ahead: 0
 - Behind: 0
