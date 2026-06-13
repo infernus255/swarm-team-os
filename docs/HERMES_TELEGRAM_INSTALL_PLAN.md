@@ -285,8 +285,8 @@ hermes setup
 
 ### Repositorio git
 - Rama: hermes-telegram-isolated-env
-- Commit: f41c5e4c6895ce3a2f17bca256a47d9ae8ab1c71
-- Mensaje: Fix: Finalize Windows/Docker environment setup, configure API key limits, and fix encoding issues
+- Commit: 2f85f15e54659bae7f736c117367bd19fe4dffb5
+- Mensaje: Docs: Update state.json and HERMES_TELEGRAM_INSTALL_PLAN.md with latest git metadata
 - Cambios modificados: 0
 - Archivos no rastreados: 0
 - Ahead: 0
