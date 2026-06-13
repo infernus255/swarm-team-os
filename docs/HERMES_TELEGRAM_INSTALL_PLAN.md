@@ -285,10 +285,10 @@ hermes setup
 
 ### Repositorio git
 - Rama: hermes-telegram-isolated-env
-- Commit: 20251d02333aa10e274f14aab13f9b1b969cfabe
-- Mensaje: Fix: Clean API keys from alias prefix in docker-entrypoint to resolve model provider failures
+- Commit: ec4879dde602564edcefa97417f424bad4d9ef65
+- Mensaje: Auto commit: validate state/docs/hermes/copilot/n8n/docker and push
 - Cambios modificados: 1
-- Archivos no rastreados: 0
+- Archivos no rastreados: 1
 - Ahead: 0
 - Behind: 0
 <!-- STATE-END -->
