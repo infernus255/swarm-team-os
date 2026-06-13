@@ -285,9 +285,9 @@ hermes setup
 
 ### Repositorio git
 - Rama: hermes-telegram-isolated-env
-- Commit: 2f85f15e54659bae7f736c117367bd19fe4dffb5
-- Mensaje: Docs: Update state.json and HERMES_TELEGRAM_INSTALL_PLAN.md with latest git metadata
-- Cambios modificados: 0
+- Commit: 67371a5c76e913a79cb26b87cf76613810a4de4c
+- Mensaje: Docs: Update state showing active Telegram Gateway
+- Cambios modificados: 2
 - Archivos no rastreados: 0
 - Ahead: 0
 - Behind: 0

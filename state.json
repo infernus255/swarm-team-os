@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-06-13T00:46:28.838344Z",
+  "timestamp": "2026-06-13T00:50:15.475657Z",
   "current_environment_id": "DESKTOP-Q0NMPDE:host:hermes-telegram-isolated-env",
   "environment": {
     "environment_id": "DESKTOP-Q0NMPDE:host:hermes-telegram-isolated-env",
@@ -8,7 +8,7 @@
     "env_type": "host",
     "container_id": null,
     "path": "C:\\Users\\admin\\.gemini\\antigravity\\worktrees\\hermes-swarm\\hermes-telegram-isolated-env",
-    "timestamp": "2026-06-13T00:46:22.814743Z"
+    "timestamp": "2026-06-13T00:50:09.457436Z"
   },
   "environments": {
     "codespaces-16ec44:host:hermes-test": {
@@ -53,7 +53,7 @@
         "env_type": "host",
         "container_id": null,
         "path": "C:\\Users\\admin\\.gemini\\antigravity\\worktrees\\hermes-swarm\\hermes-telegram-isolated-env",
-        "timestamp": "2026-06-13T00:46:22.814743Z"
+        "timestamp": "2026-06-13T00:50:09.457436Z"
       },
       "hermes": {
         "installed": true,
@@ -80,10 +80,10 @@
       },
       "git": {
         "branch": "hermes-telegram-isolated-env",
-        "commit": "2f85f15e54659bae7f736c117367bd19fe4dffb5",
-        "message": "Docs: Update state.json and HERMES_TELEGRAM_INSTALL_PLAN.md with latest git metadata",
+        "commit": "67371a5c76e913a79cb26b87cf76613810a4de4c",
+        "message": "Docs: Update state showing active Telegram Gateway",
         "status": {
-          "modified": 0,
+          "modified": 2,
           "untracked": 0,
           "ahead": 0,
           "behind": 0

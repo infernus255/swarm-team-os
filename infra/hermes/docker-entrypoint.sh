@@ -14,7 +14,8 @@ GATEWAY_ALLOW_ALL_USERS=${GATEWAY_ALLOW_ALL_USERS:-false}
 EOF
 
 if [ -n "${GEMINI_API_KEY}" ]; then
-  echo "GEMINI_API_KEY=${GEMINI_API_KEY}" >> /root/.hermes/.env
+  CLEAN_KEY=$(echo "${GEMINI_API_KEY}" | sed -E 's/^[a-zA-Z0-9_]+:(AIzaSy[a-zA-Z0-9_-]+)/\1/')
+  echo "GEMINI_API_KEY=${CLEAN_KEY}" >> /root/.hermes/.env
 fi
 
 if [ -n "${GEMINI_API_KEYS}" ]; then
@@ -22,7 +23,8 @@ if [ -n "${GEMINI_API_KEYS}" ]; then
 fi
 
 if [ -n "${GOOGLE_API_KEY}" ]; then
-  echo "GOOGLE_API_KEY=${GOOGLE_API_KEY}" >> /root/.hermes/.env
+  CLEAN_KEY=$(echo "${GOOGLE_API_KEY}" | sed -E 's/^[a-zA-Z0-9_]+:(AIzaSy[a-zA-Z0-9_-]+)/\1/')
+  echo "GOOGLE_API_KEY=${CLEAN_KEY}" >> /root/.hermes/.env
 fi
 
 if [ -n "${GOOGLE_API_KEYS}" ]; then
