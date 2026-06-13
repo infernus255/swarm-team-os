@@ -16,8 +16,19 @@ RUN apt-get update \
 
 RUN curl -fsSL https://raw.githubusercontent.com/NousResearch/hermes-agent/main/scripts/install.sh | bash
 
+RUN if [ -f /usr/local/lib/hermes-agent/venv/bin/pip ]; then \
+        /usr/local/lib/hermes-agent/venv/bin/pip install --break-system-packages psycopg2-binary pgvector; \
+    elif [ -f /root/.hermes/hermes-agent/venv/bin/pip ]; then \
+        /root/.hermes/hermes-agent/venv/bin/pip install --break-system-packages psycopg2-binary pgvector; \
+    else \
+        pip install --break-system-packages psycopg2-binary pgvector; \
+    fi
+
+
 ENV PATH="/root/.local/bin:/root/.hermes/hermes-agent/venv/bin:$PATH"
-WORKDIR /root
+WORKDIR /app
+
+
 
 COPY infra/hermes/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 RUN sed -i 's/\r$//' /usr/local/bin/docker-entrypoint.sh

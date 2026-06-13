@@ -18,6 +18,18 @@ if [ -n "${GEMINI_API_KEY}" ]; then
   echo "GEMINI_API_KEY=${CLEAN_KEY}" >> /root/.hermes/.env
 fi
 
+if [ -n "${DATABASE_URL}" ]; then
+  echo "DATABASE_URL=${DATABASE_URL}" >> /root/.hermes/.env
+fi
+if [ -n "${NODE_ID}" ]; then
+  echo "NODE_ID=${NODE_ID}" >> /root/.hermes/.env
+fi
+if [ -n "${NODE_TOKEN}" ]; then
+  CLEAN_TOKEN=$(echo "${NODE_TOKEN}" | sed -E 's/^[a-zA-Z0-9_]+://')
+  echo "NODE_TOKEN=${CLEAN_TOKEN}" >> /root/.hermes/.env
+fi
+
+
 if [ -n "${GEMINI_API_KEYS}" ]; then
   echo "GEMINI_API_KEYS=${GEMINI_API_KEYS}" >> /root/.hermes/.env
 fi

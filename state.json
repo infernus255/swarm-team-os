@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-06-13T03:58:22.945171Z",
+  "timestamp": "2026-06-13T14:01:21.254502Z",
   "current_environment_id": "DESKTOP-Q0NMPDE:host:hermes-telegram-isolated-env",
   "environment": {
     "environment_id": "DESKTOP-Q0NMPDE:host:hermes-telegram-isolated-env",
@@ -8,7 +8,7 @@
     "env_type": "host",
     "container_id": null,
     "path": "C:\\Users\\admin\\.gemini\\antigravity\\worktrees\\hermes-swarm\\hermes-telegram-isolated-env",
-    "timestamp": "2026-06-13T03:58:15.813200Z"
+    "timestamp": "2026-06-13T14:01:14.644200Z"
   },
   "environments": {
     "codespaces-16ec44:host:hermes-test": {
@@ -53,7 +53,7 @@
         "env_type": "host",
         "container_id": null,
         "path": "C:\\Users\\admin\\.gemini\\antigravity\\worktrees\\hermes-swarm\\hermes-telegram-isolated-env",
-        "timestamp": "2026-06-13T03:58:15.813200Z"
+        "timestamp": "2026-06-13T14:01:14.644200Z"
       },
       "hermes": {
         "installed": true,
@@ -80,11 +80,11 @@
       },
       "git": {
         "branch": "hermes-telegram-isolated-env",
-        "commit": "20251d02333aa10e274f14aab13f9b1b969cfabe",
-        "message": "Fix: Clean API keys from alias prefix in docker-entrypoint to resolve model provider failures",
+        "commit": "cb6c4207e8abb3eb2804c8da07dc9ced761c0f5b",
+        "message": "Fix: Auto-configure fallback providers in docker-entrypoint for seamless deployment replication",
         "status": {
-          "modified": 1,
-          "untracked": 0,
+          "modified": 5,
+          "untracked": 1,
           "ahead": 0,
           "behind": 0
         }
