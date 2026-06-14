@@ -262,40 +262,32 @@ hermes setup
 ## 14. Estado actual y validación
 
 ### Entorno actual
-- Environment ID: f7cf22cfe220:host:app
+- Environment ID: DESKTOP-Q0NMPDE:host:hermes-telegram-isolated-env
 - Environment type: host
 
 ### Hermes
 - Instalado: True
-- Versión: Hermes Agent v0.16.0 (2026.6.5) · upstream dc467488
+- Versión: None
 - Proveedor: gemini
 - Modelo por defecto: gemini-3.5-flash
 - Base URL: https://generativelanguage.googleapis.com/v1beta/openai
 - Gateway Telegram: telegram_not_configured
 
 ### Sistema operativo
-- Nombre: Ubuntu 24.04.4 LTS
-- Versión: 24.04.4 LTS (Noble Numbat)
+- Nombre: nt
+- Versión: Unknown
 - Paquetes verificados:
-  - curl: installed
-  - git: installed
-  - python3: installed
-  - python3-venv: installed
-  - python3-pip: installed
-  - npm: installed
-  - xz-utils: installed
-  - ca-certificates: installed
 
 ### API keys
 - Total de claves detectadas: 1
 - Proveedores: GEMINI
-  - primary (GEMINI): limit=unknown, source=GEMINI_API_KEY
+  - primary (GEMINI): limit=1000000, source=GEMINI_API_KEY
 
 ### Repositorio git
-- Rama: None
-- Commit: None
-- Mensaje: None
-- Cambios modificados: 0
+- Rama: hermes-telegram-isolated-env
+- Commit: 8051c11193b92d97feba25f634bf31ce90b8c878
+- Mensaje: Validation check after fixing key limits
+- Cambios modificados: 6
 - Archivos no rastreados: 0
 - Ahead: 0
 - Behind: 0

@@ -62,6 +62,13 @@ hermes config set model.provider gemini || true
 hermes config set model.default gemini-3.5-flash || true
 hermes config set model.base_url https://generativelanguage.googleapis.com/v1beta/openai || true
 
+if [ -x /usr/local/lib/hermes-agent/venv/bin/python3 ]; then
+  /usr/local/lib/hermes-agent/venv/bin/python3 -m pip install psycopg2-binary pgvector || true
+fi
+if [ -x /root/.hermes/hermes-agent/venv/bin/python3 ]; then
+  /root/.hermes/hermes-agent/venv/bin/python3 -m pip install psycopg2-binary pgvector || true
+fi
+
 # Auto-configure fallback chain if not present
 /usr/local/lib/hermes-agent/venv/bin/python3 -c "
 import yaml

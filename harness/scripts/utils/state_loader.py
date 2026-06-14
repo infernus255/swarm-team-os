@@ -8,6 +8,7 @@ from pathlib import Path
 class StateLoader:
     _instance = None
     _cache = None
+    _lock_depth = 0
 
     def __new__(cls):
         if cls._instance is None:
@@ -31,16 +32,30 @@ class StateLoader:
 
     def acquire_lock(self, timeout=15):
         """Bloqueo portátil basado en filesystem para evitar colisiones de concurrencia."""
+        if self.lock_file.exists():
+            try:
+                owner_pid = int(self.lock_file.read_text(encoding="utf-8").strip())
+                if owner_pid == os.getpid():
+                    self._lock_depth += 1
+                    return
+            except Exception:
+                pass
+
         start_time = time.time()
         while self.lock_file.exists():
             if time.time() - start_time > timeout:
                 raise TimeoutError("Harness Lock Timeout: state.json bloqueado por otro proceso activo.")
             time.sleep(0.1)
         self.lock_file.write_text(str(os.getpid()), encoding="utf-8")
+        self._lock_depth = 1
 
     def release_lock(self):
+        if self._lock_depth > 1:
+            self._lock_depth -= 1
+            return
         if self.lock_file.exists():
             self.lock_file.unlink()
+        self._lock_depth = 0
 
     def load_state(self, force_reload=False) -> dict:
         if self._cache and not force_reload:

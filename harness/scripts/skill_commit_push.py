@@ -183,61 +183,65 @@ def git_add_commit_push(message):
 
 
 def main():
-    state, err = load_state()
-    if err:
-        print(err)
-        sys.exit(1)
+    loader.acquire_lock()
+    try:
+        state, err = load_state()
+        if err:
+            print(err)
+            sys.exit(1)
 
-    print("Validando archivos de documentación...")
-    errors = []
-    for path in VALIDATION_FILES:
-        ok, msg = validate_file(path)
+        print("Validando archivos de documentación...")
+        errors = []
+        for path in VALIDATION_FILES:
+            ok, msg = validate_file(path)
+            if not ok:
+                errors.append(msg)
+
+        print("Validando estado del sistema operativo...")
+        ok, msg = validate_os(state)
         if not ok:
             errors.append(msg)
 
-    print("Validando estado del sistema operativo...")
-    ok, msg = validate_os(state)
-    if not ok:
-        errors.append(msg)
+        print("Validando Hermes...")
+        ok, msg = validate_hermes(state)
+        if not ok:
+            errors.append(msg)
 
-    print("Validando Hermes...")
-    ok, msg = validate_hermes(state)
-    if not ok:
-        errors.append(msg)
+        print("Validando documentación de Copilot...")
+        ok, msg = validate_copilot_docs()
+        if not ok:
+            errors.append(msg)
 
-    print("Validando documentación de Copilot...")
-    ok, msg = validate_copilot_docs()
-    if not ok:
-        errors.append(msg)
+        print("Validando claves API y límites...")
+        ok, msg = validate_api_keys(state)
+        if not ok:
+            errors.append(msg)
 
-    print("Validando claves API y límites...")
-    ok, msg = validate_api_keys(state)
-    if not ok:
-        errors.append(msg)
+        print("Validando n8n...")
+        ok, msg = validate_n8n()
+        if not ok:
+            errors.append(msg)
 
-    print("Validando n8n...")
-    ok, msg = validate_n8n()
-    if not ok:
-        errors.append(msg)
+        print("Validando Docker...")
+        ok, msg = validate_docker()
+        if not ok:
+            errors.append(msg)
 
-    print("Validando Docker...")
-    ok, msg = validate_docker()
-    if not ok:
-        errors.append(msg)
+        if errors:
+            print("\nValidación fallida con los siguientes errores:")
+            for item in errors:
+                print(f"- {item}")
+            sys.exit(1)
 
-    if errors:
-        print("\nValidación fallida con los siguientes errores:")
-        for item in errors:
-            print(f"- {item}")
-        sys.exit(1)
+        commit_message = "Auto commit: validate state/docs/hermes/copilot/n8n/docker and push"
+        if len(sys.argv) > 1:
+            commit_message = " ".join(sys.argv[1:])
 
-    commit_message = "Auto commit: validate state/docs/hermes/copilot/n8n/docker and push"
-    if len(sys.argv) > 1:
-        commit_message = " ".join(sys.argv[1:])
-
-    print("Todas las validaciones pasaron. Commit y push en progreso...")
-    git_add_commit_push(commit_message)
-    print("Commit y push completados.")
+        print("Todas las validaciones pasaron. Commit y push en progreso...")
+        git_add_commit_push(commit_message)
+        print("Commit y push completados.")
+    finally:
+        loader.release_lock()
 
 
 if __name__ == "__main__":
