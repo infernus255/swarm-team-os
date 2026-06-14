@@ -1,13 +1,14 @@
 {
-  "timestamp": "2026-06-14T23:15:00.000Z",
-  "current_environment_id": "GLOBAL_ORCHESTRATOR",
+  "timestamp": "2026-06-14T16:16:29.412339Z",
+  "current_environment_id": "DESKTOP-Q0NMPDE:host:hermes-swarm",
   "environment": {
-    "environment_id": "GLOBAL_ORCHESTRATOR",
-    "environment_name": "SwarmTeam-OS-Unified",
+    "environment_id": "DESKTOP-Q0NMPDE:host:hermes-swarm",
+    "environment_name": "DESKTOP-Q0NMPDE",
     "user": "admin",
-    "env_type": "orchestrator",
-    "path": "./",
-    "timestamp": "2026-06-14T23:15:00.000Z"
+    "env_type": "host",
+    "container_id": null,
+    "path": "C:\\Users\\admin\\source\\repos\\hermes-swarm",
+    "timestamp": "2026-06-14T16:16:27.111699Z"
   },
   "environments": {
     "codespaces-16ec44:host:hermes-test": {
@@ -21,7 +22,7 @@
       },
       "hermes": {
         "installed": true,
-        "version": "Hermes Agent v0.16.0 (2026.6.5) · upstream 210f4e70",
+        "version": "Hermes Agent v0.16.0 (2026.6.5) \u00b7 upstream 210f4e70",
         "provider": "gemini",
         "model_default": "gemini-3.5-flash",
         "base_url": "https://generativelanguage.googleapis.com/v1beta/openai",
@@ -61,6 +62,59 @@
       "role": "Heavy Compute / Local LLM / GPU Inference",
       "specs": "Ryzen 3600X / 16 GB RAM / RX 5600XT",
       "last_sync": null
+    },
+    "DESKTOP-Q0NMPDE:host:hermes-swarm": {
+      "environment": {
+        "environment_id": "DESKTOP-Q0NMPDE:host:hermes-swarm",
+        "environment_name": "DESKTOP-Q0NMPDE",
+        "user": "admin",
+        "env_type": "host",
+        "container_id": null,
+        "path": "C:\\Users\\admin\\source\\repos\\hermes-swarm",
+        "timestamp": "2026-06-14T16:16:27.111699Z"
+      },
+      "hermes": {
+        "installed": true,
+        "version": null,
+        "provider": null,
+        "model_default": null,
+        "base_url": null,
+        "gateway": null
+      },
+      "system": {
+        "os_name": "nt",
+        "os_version": "10.0.22000",
+        "packages_checked": [],
+        "required_packages": [
+          "curl",
+          "git",
+          "python3",
+          "python3-venv",
+          "python3-pip",
+          "npm",
+          "xz-utils",
+          "ca-certificates"
+        ]
+      },
+      "git": {
+        "branch": "develop",
+        "commit": "284cedf0f7c0bfdb9ea3a3362d6089f4a934f43f",
+        "message": "Initial SOTA Unification: Implement Multi-Node Jarvis OS with Poly-Swarm Selector, Neon Cloud Memory, and AI Autorunners",
+        "status": {
+          "modified": 6,
+          "untracked": 5,
+          "ahead": 0,
+          "behind": 0
+        }
+      },
+      "api_keys": {
+        "summary": {
+          "total_keys": 0,
+          "providers": []
+        },
+        "keys": [],
+        "limits_source": "api_key_limits.json or API_KEY_LIMITS env"
+      }
     }
   }
 }

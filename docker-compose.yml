@@ -37,14 +37,10 @@ services:
       TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN}
       GEMINI_API_KEY: ${GEMINI_API_KEY}
       SGA_URL: http://sga:8000
+      DATABASE_URL: ${DATABASE_URL:-postgresql://postgres:${POSTGRES_PASSWORD:-hermes123}@postgres:5432/sga}
     volumes:
       # MONTAR TU TRABAJO (read-only para proteger piezas clave, RW para estado)
-      - ./harness:/app/harness:ro
-      - ./state.json:/app/state.json
-      - ./core:/app/core:ro
-      - ./swarm:/app/swarm:ro
-      - ./app_result:/app/app_result
-      # Persistencia de Hermes
+      - .:/app
       - hermes-memory:/root/.hermes
     depends_on:
       - sga

@@ -11,6 +11,7 @@ from pathlib import Path
 from utils.state_loader import StateLoader
 
 loader = StateLoader()
+REPO_ROOT = loader.repo_root
 DOCKER_IMAGE = "hermes-test"
 KEY_LIMITS_FILE = loader.repo_root / "api_key_limits.json"
 API_KEY_LIMITS_ENV = "API_KEY_LIMITS"
@@ -18,9 +19,9 @@ API_KEY_LIMITS_ENV = "API_KEY_LIMITS"
 
 def run_command(cmd, capture_output=True, check=False):
     try:
-        result = subprocess.run(cmd, capture_output=capture_output, text=True, check=check)
-        return result.stdout.strip()
-    except subprocess.CalledProcessError:
+        result = subprocess.run(cmd, capture_output=capture_output, text=True, check=check, encoding="utf-8", errors="replace")
+        return result.stdout.strip() if (result and result.stdout) else ""   
+    except Exception:
         return ""
 
 
@@ -73,7 +74,7 @@ def load_key_limit_config():
     limits = {}
     if KEY_LIMITS_FILE.exists():
         try:
-            data = json.loads(KEY_LIMITS_FILE.read_text(encoding="utf-8"))
+            data = json.loads(KEY_LIMITS_FILE.read_text(encoding="utf-8"))   
             if isinstance(data, dict) and "keys" in data:
                 data = data["keys"]
             if isinstance(data, dict):
@@ -107,13 +108,13 @@ def format_key_limit(alias, key_id, limits):
 
 def extract_api_keys_data():
     env_values = {}
-    env_values.update(os.environ)
-    repo_env = loader.repo_root / "hermes.env"
-    if repo_env.exists():
-        env_values.update(load_env_file(repo_env))
     home_env = Path.home() / ".hermes" / ".env"
     if home_env.exists():
         env_values.update(load_env_file(home_env))
+    repo_env = loader.repo_root / "hermes.env"
+    if repo_env.exists():
+        env_values.update(load_env_file(repo_env))
+    env_values.update(os.environ)
 
     key_limits = load_key_limit_config()
     keys = []
@@ -137,7 +138,7 @@ def extract_api_keys_data():
                     "alias": alias or f"key-{len(keys)+1}",
                     "key_id": key_id,
                     "limit": limit,
-                    "limit_source": limit_entry if limit_entry else None,
+                    "limit_source": limit_entry if limit_entry else None,    
                     "source": source,
                     "note": "Carga de múltiples claves API"
                 })
@@ -152,17 +153,17 @@ def extract_api_keys_data():
                 "alias": alias or "primary",
                 "key_id": key_id,
                 "limit": limit,
-                "limit_source": limit_entry if limit_entry else None,
+                "limit_source": limit_entry if limit_entry else None,        
                 "source": source,
                 "note": "Clave API principal"
             })
 
     for name in ["GEMINI_API_KEY", "GOOGLE_API_KEY"]:
         if name in env_values:
-            add_key(name.replace("_API_KEY", ""), env_values[name], name)
+            add_key(name.replace("_API_KEY", ""), env_values[name], name)    
     for name in ["GEMINI_API_KEYS", "GOOGLE_API_KEYS"]:
         if name in env_values:
-            add_key(name.replace("_API_KEYS", ""), env_values[name], name)
+            add_key(name.replace("_API_KEYS", ""), env_values[name], name)   
 
     summary = {
         "total_keys": len(keys),
@@ -191,16 +192,23 @@ def get_hermes_status():
         if output:
             version_line = output.splitlines()[0].strip()
             result["version"] = version_line
-        config_output = run_command(["hermes", "config", "show"]) or ""
+        config_output = run_command(["hermes", "config", "show"]) or ""      
     else:
         docker_available = shutil.which("docker") is not None
         if docker_available:
             image_list = run_command(["docker", "images", "-q", DOCKER_IMAGE])
             if image_list:
                 result["installed"] = True
+                env_args = []
+                repo_env = loader.repo_root / "hermes.env"
+                if repo_env.exists():
+                    env_data = load_env_file(repo_env)
+                    for k, v in env_data.items():
+                        env_args.extend(["-e", f"{k}={v}"])
                 config_output = run_command([
-                    "docker", "run", "--rm", "--entrypoint", "/bin/bash", DOCKER_IMAGE,
-                    "-lc", 'hermes config show'
+                    "docker", "run", "--rm"
+                ] + env_args + [
+                    DOCKER_IMAGE, "hermes", "config", "show"
                 ]) or ""
             else:
                 config_output = ""
@@ -208,7 +216,7 @@ def get_hermes_status():
             config_output = ""
 
     if config_output:
-        model_match = re.search(r"Model:\s+\{([^}]+)\}", config_output)
+        model_match = re.search(r"Model:\s+\{([^}]+)\}", config_output)      
         if model_match:
             model_content = model_match.group(1)
             provider_match = re.search(r"'provider': '([^']+)'", model_content)
@@ -254,10 +262,10 @@ def get_git_state():
         "branch": None,
         "commit": None,
         "message": None,
-        "status": {"modified": 0, "untracked": 0, "ahead": 0, "behind": 0}
+        "status": {"modified": 0, "untracked": 0, "ahead": 0, "behind": 0}   
     }
     if shutil.which("git"):
-        branch = run_command(["git", "rev-parse", "--abbrev-ref", "HEAD"])
+        branch = run_command(["git", "rev-parse", "--abbrev-ref", "HEAD"])   
         if branch:
             git["branch"] = branch
         commit = run_command(["git", "rev-parse", "HEAD"])
@@ -283,12 +291,20 @@ def get_git_state():
 
 
 def get_environment_metadata():
-    host_name = os.uname().nodename
+    try:
+        host_name = os.uname().nodename
+    except AttributeError:
+        import platform
+        host_name = platform.node()
     user = os.getenv("USER") or os.getenv("USERNAME") or "unknown"
     path = str(REPO_ROOT)
     in_container = False
     container_id = None
     env_type = "host"
+
+    if Path("/.dockerenv").exists() or Path("/run/.containerenv").exists():  
+        in_container = True
+        env_type = "container"
 
     if Path("/proc/1/cgroup").exists():
         content = Path("/proc/1/cgroup").read_text(errors="ignore")
@@ -306,7 +322,7 @@ def get_environment_metadata():
 
     metadata = {
         "environment_id": env_id,
-        "environment_name": os.getenv("ENVIRONMENT_NAME") or host_name,
+        "environment_name": os.getenv("ENVIRONMENT_NAME") or host_name,      
         "user": user,
         "env_type": env_type,
         "container_id": container_id,

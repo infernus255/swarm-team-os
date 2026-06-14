@@ -15,6 +15,19 @@ class JarvisAssistant:
     def __init__(self):
         self.swarm_runner = GraphRunner()
         self.engine_selector = EngineSelector(Path.cwd())
+        self._check_version()
+
+    def _check_version(self):
+        """Checks if the current Jarvis version is outdated compared to the swarm."""
+        latest_version = sga_client.get_latest_system_version()
+        local_version = sga_client.local_version
+        
+        if local_version < latest_version:
+            print(f"⚠️ [VERSION]: Estás ejecutando una versión antigua (v{local_version}).")
+            print(f"🚀 [VERSION]: La última versión curada en el enjambre es v{latest_version}.")
+            print(f"💡 [VERSION]: Por favor, ejecuta 'git pull' para actualizar este nodo.")
+        else:
+            print(f"✅ [VERSION]: Jarvis OS v{local_version} está actualizado.")
 
     async def handle_request(self, prompt: str):
         print(f"--- Jarvis analizando: '{prompt}' ---")

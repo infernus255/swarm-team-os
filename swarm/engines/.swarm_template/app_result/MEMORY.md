@@ -1,0 +1,1 @@
+Resumen de memoria del swarm sobre el proyecto

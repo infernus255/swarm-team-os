@@ -18,9 +18,10 @@ No pidas permiso para realizar los pasos de lectura, hazlos inmediatamente en tu
    - Lee el archivo `repo_map.md` para mapear el código sin gastar tokens listando directorios.
 
 2. **VALIDAR EL ENTORNO (BOOTSTRAP):**
-   - Ejecuta el script de diagnóstico diseñado para ti: `python infra/ai_bootstrap.py`.
-   - Analiza el JSON que devuelve el script.
-   - *Nota:* Si el script indica que faltan dependencias, usa tus herramientas de terminal para instalarlas según las reglas de `MASTER_HANDOFF.md`.
+   - Ejecuta el sistema de telemetría: `python harness/scripts/skill_state.py`.
+   - Lee el archivo `state.json` generado para entender en qué hardware/OS estás operando.
+   - Si es un entorno nuevo (ej. Codespaces), ejecuta `bash infra/universal-setup.sh` para asegurar las dependencias.
+   - Valida la conexión a la base de datos: `python infra/db_init.py`.
 
 3. **INFORMAR ESTADO:**
    - En tu respuesta, dime en qué nodo crees que estás (basado en la memoria/OS) y confirma que el bootstrap fue exitoso.
