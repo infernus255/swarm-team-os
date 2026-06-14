@@ -1,15 +1,13 @@
+# Registro de Memoria del Sistema y Aprendizajes
 
-### 2026-06-11T06:13:52.822246Z
-- Initial environment adaptation setup complete.
+## 📅 Últimas Actualizaciones (Junio 2026)
 
-### 2026-06-12T19:14:33.062401Z
-- En entornos Windows y Docker, para que pase la validaci├│n de API keys, es necesario crear api_key_limits.json en la ra├¡z del repositorio con los l├¡mites correspondientes y declarar las claves en hermes.env con el prefijo 'alias:' (ej. GEMINI_API_KEY=primary:CLAVE). Adem├ís, si Hermes se ejecuta ├║nicamente dentro de Docker, se debe construir la imagen y etiquetarla como 'hermes-test:latest' para que la validaci├│n de estado la reconozca. Las im├ígenes privadas en GHCR requieren un PAT con scope 'read:packages' para evitar errores 'not found'.
+- **Validación de API Keys**: En entornos Windows y Docker, para que pase la validación de API keys, es necesario crear `api_key_limits.json` en la raíz del repositorio con los límites correspondientes y declarar las claves en `hermes.env` con el prefijo 'alias:' (ej. `GEMINI_API_KEY=primary:CLAVE`). Además, si Hermes se ejecuta únicamente dentro de Docker, se debe construir la imagen y etiquetarla como `hermes-test:latest`.
 
-### 2026-06-13T00:50:03.586830Z
-- Se corrigi├│ el error 'model provider failed after retries' al limpiar las claves API de los prefijos de alias (ej. 'primary:') en el entrypoint del contenedor (docker-entrypoint.sh) antes de inyectarlas en la configuraci├│n de Hermes (.env). Esto permite que el analizador de telemetr├¡a mantenga el alias para mapear los l├¡mites, mientras que Hermes recibe la clave API limpia para autenticarse con el proveedor.
+- **Manejo de Prefijos en API Keys**: Se corrigió el error 'model provider failed' al limpiar las claves API de los prefijos de alias en el entrypoint del contenedor (`docker-entrypoint.sh`). Esto permite que la telemetría mantenga el alias para mapear los límites, mientras que Hermes recibe la clave limpia.
 
-### 2026-06-13T14:30:00.000000Z
-- **Migraci├│n a Neon Cloud DB & Persistencia Vectorial Directa (SGA)**: Se migr├│ la base de datos de persistencia a Neon.tech (PostgreSQL serverless) para eliminar el contenedor local redundante de SGA. El nuevo inicializador `infra/db_init.py` habilita la extensi├│n vector, crea las tablas con tokens SHA-256 e implementa ├¡ndices vectoriales HNSW. El cliente de memoria directo `memory/sga_client.py` ahora implementa un cach├®/pool de conexi├│n persistente para evitar handshakes TCP repetitivos (reduciendo latencias de 60s a milisegundos) e inyecta embeddings Gemini con dimensi├│n exacta de 768 mediante `gemini-embedding-2` con `outputDimensionality: 768`, cayendo a b├║squedas keyword ILIKE en L0 si el proveedor de embeddings falla.
-- **Bypass de PEP 668 en Ubuntu 24.04 (Docker)**: La instalaci├│n de paquetes psycopg2-binary y pgvector sobre el contenedor basado en Ubuntu 24.04 arroj├│ errores de entorno externamente administrado. Se resolvi├│ usando el flag `--break-system-packages` de pip en las rutas de virtualenv y globales en el `Dockerfile`.
-- **Mapeo de Rutas y Persona de Jarvis OS en Telegram**: Para que el agente Hermes ejecutado en Docker herede el contexto de este repositorio y deje de reportar que la carpeta `/root` est├í vac├¡a, se reestructur├│ `docker-compose.yml` para montar la ra├¡z completa en `/app` de forma de lectura (`.:/app:ro`) superponiendo escrituras de estado, y se redefini├│ `WORKDIR /app` en el `Dockerfile`. Se implement├│ un perfil de sistema maestro `infra/hermes/SOUL.md` que le inyecta al agente la personalidad de Jarvis OS, d├índole visibilidad completa del ├írbol de archivos, del chasis del harness y de las skills de ejecuci├│n, copi├índose a `~/.hermes/SOUL.md` en el entrypoint.
+- **Migración a Neon Cloud DB (SGA)**: Se migró la base de datos de persistencia a Neon.tech (PostgreSQL serverless). El nuevo inicializador `infra/db_init.py` habilita la extensión `vector` e implementa índices HNSW. El cliente `memory/sga_client.py` ahora implementa un pool de conexión persistente e inyecta embeddings Gemini con dimensión exacta de 768.
 
+- **Bypass de PEP 668**: La instalación de paquetes sobre el contenedor basado en Ubuntu 24.04 arrojó errores de entorno administrado. Se resolvió usando el flag `--break-system-packages` de pip en el `Dockerfile`.
+
+- **Mapeo de Rutas y Persona**: Se reestructuró `docker-compose.yml` para montar la raíz completa en `/app`. Se implementó un perfil de sistema maestro `infra/hermes/SOUL.md` que inyecta la personalidad de Jarvis OS al agente Hermes.

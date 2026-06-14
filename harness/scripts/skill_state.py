@@ -301,30 +301,40 @@ def get_environment_metadata():
     in_container = False
     container_id = None
     env_type = "host"
+    is_codespaces = os.getenv("CODESPACES") == "true"
 
     if Path("/.dockerenv").exists() or Path("/run/.containerenv").exists():  
         in_container = True
         env_type = "container"
 
     if Path("/proc/1/cgroup").exists():
-        content = Path("/proc/1/cgroup").read_text(errors="ignore")
-        if "docker" in content or "kubepods" in content or "containerd" in content:
-            in_container = True
-            env_type = "container"
-            match = re.search(r"[0-9a-f]{64}", content)
-            if match:
-                container_id = match.group(0)
-    env_id = os.getenv("ENVIRONMENT_ID") or os.getenv("HEREMES_ENVIRONMENT_ID")
-    if not env_id:
-        env_id = f"{host_name}:{env_type}:{os.path.basename(path)}"
-        if container_id:
-            env_id = f"{env_id}:{container_id[:12]}"
+        try:
+            content = Path("/proc/1/cgroup").read_text(errors="ignore")
+            if "docker" in content or "kubepods" in content or "containerd" in content:
+                in_container = True
+                env_type = "container"
+                match = re.search(r"[0-9a-f]{64}", content)
+                if match:
+                    container_id = match.group(0)
+        except Exception:
+            pass
+
+    if is_codespaces:
+        env_type = "codespaces"
+        env_id = os.getenv("CODESPACE_NAME") or f"codespaces:{host_name}"
+    else:
+        env_id = os.getenv("ENVIRONMENT_ID") or os.getenv("HEREMES_ENVIRONMENT_ID")
+        if not env_id:
+            env_id = f"{host_name}:{env_type}:{os.path.basename(path)}"
+            if container_id:
+                env_id = f"{env_id}:{container_id[:12]}"
 
     metadata = {
         "environment_id": env_id,
-        "environment_name": os.getenv("ENVIRONMENT_NAME") or host_name,      
+        "environment_name": os.getenv("ENVIRONMENT_NAME") or (os.getenv("CODESPACE_NAME") if is_codespaces else host_name),      
         "user": user,
         "env_type": env_type,
+        "is_codespaces": is_codespaces,
         "container_id": container_id,
         "path": path,
         "timestamp": datetime.now(timezone.utc).isoformat().replace('+00:00', 'Z')
