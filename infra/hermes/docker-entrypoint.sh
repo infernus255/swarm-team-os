@@ -8,11 +8,14 @@ fi
 
 mkdir -p /root/.hermes
 cp /app/infra/hermes/SOUL.md /root/.hermes/SOUL.md || true
+mkdir -p /root/.hermes/skills
+cp -r /app/infra/hermes/skills/* /root/.hermes/skills/ 2>/dev/null || true
 rm -f /root/.hermes/.env
 cat > /root/.hermes/.env <<EOF
 TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
 GATEWAY_ALLOW_ALL_USERS=${GATEWAY_ALLOW_ALL_USERS:-false}
 EOF
+
 
 
 if [ -n "${GEMINI_API_KEY}" ]; then

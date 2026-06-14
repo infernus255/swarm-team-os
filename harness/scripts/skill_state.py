@@ -108,13 +108,13 @@ def format_key_limit(alias, key_id, limits):
 
 def extract_api_keys_data():
     env_values = {}
-    env_values.update(os.environ)
-    repo_env = loader.repo_root / "hermes.env"
-    if repo_env.exists():
-        env_values.update(load_env_file(repo_env))
     home_env = Path.home() / ".hermes" / ".env"
     if home_env.exists():
         env_values.update(load_env_file(home_env))
+    repo_env = loader.repo_root / "hermes.env"
+    if repo_env.exists():
+        env_values.update(load_env_file(repo_env))
+    env_values.update(os.environ)
 
     key_limits = load_key_limit_config()
     keys = []
@@ -301,6 +301,10 @@ def get_environment_metadata():
     in_container = False
     container_id = None
     env_type = "host"
+
+    if Path("/.dockerenv").exists() or Path("/run/.containerenv").exists():
+        in_container = True
+        env_type = "container"
 
     if Path("/proc/1/cgroup").exists():
         content = Path("/proc/1/cgroup").read_text(errors="ignore")

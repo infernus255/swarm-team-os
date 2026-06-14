@@ -262,33 +262,41 @@ hermes setup
 ## 14. Estado actual y validación
 
 ### Entorno actual
-- Environment ID: DESKTOP-Q0NMPDE:host:hermes-telegram-isolated-env
+- Environment ID: f7cf22cfe220:host:app
 - Environment type: host
 
 ### Hermes
 - Instalado: True
-- Versión: None
+- Versión: Hermes Agent v0.16.0 (2026.6.5) · upstream dc467488
 - Proveedor: gemini
 - Modelo por defecto: gemini-3.5-flash
 - Base URL: https://generativelanguage.googleapis.com/v1beta/openai
 - Gateway Telegram: telegram_not_configured
 
 ### Sistema operativo
-- Nombre: nt
-- Versión: Unknown
+- Nombre: Ubuntu 24.04.4 LTS
+- Versión: 24.04.4 LTS (Noble Numbat)
 - Paquetes verificados:
+  - curl: installed
+  - git: installed
+  - python3: installed
+  - python3-venv: installed
+  - python3-pip: installed
+  - npm: installed
+  - xz-utils: installed
+  - ca-certificates: installed
 
 ### API keys
 - Total de claves detectadas: 1
 - Proveedores: GEMINI
-  - primary (GEMINI): limit=1000000, source=GEMINI_API_KEY
+  - primary (GEMINI): limit=unknown, source=GEMINI_API_KEY
 
 ### Repositorio git
-- Rama: hermes-telegram-isolated-env
-- Commit: ec4879dde602564edcefa97417f424bad4d9ef65
-- Mensaje: Auto commit: validate state/docs/hermes/copilot/n8n/docker and push
-- Cambios modificados: 1
-- Archivos no rastreados: 1
+- Rama: None
+- Commit: None
+- Mensaje: None
+- Cambios modificados: 0
+- Archivos no rastreados: 0
 - Ahead: 0
 - Behind: 0
 <!-- STATE-END -->

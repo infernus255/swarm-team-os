@@ -1,14 +1,14 @@
 {
-  "timestamp": "2026-06-13T14:27:34.197548Z",
-  "current_environment_id": "DESKTOP-Q0NMPDE:host:hermes-telegram-isolated-env",
+  "timestamp": "2026-06-14T07:11:17.163244Z",
+  "current_environment_id": "f7cf22cfe220:host:app",
   "environment": {
-    "environment_id": "DESKTOP-Q0NMPDE:host:hermes-telegram-isolated-env",
-    "environment_name": "DESKTOP-Q0NMPDE",
-    "user": "admin",
+    "environment_id": "f7cf22cfe220:host:app",
+    "environment_name": "f7cf22cfe220",
+    "user": "unknown",
     "env_type": "host",
     "container_id": null,
-    "path": "C:\\Users\\admin\\.gemini\\antigravity\\worktrees\\hermes-swarm\\hermes-telegram-isolated-env",
-    "timestamp": "2026-06-13T14:27:28.670395Z"
+    "path": "/app",
+    "timestamp": "2026-06-14T07:11:15.616224Z"
   },
   "environments": {
     "codespaces-16ec44:host:hermes-test": {
@@ -85,6 +85,108 @@
         "status": {
           "modified": 1,
           "untracked": 1,
+          "ahead": 0,
+          "behind": 0
+        }
+      },
+      "api_keys": {
+        "summary": {
+          "total_keys": 1,
+          "providers": [
+            "GEMINI"
+          ]
+        },
+        "keys": [
+          {
+            "provider": "GEMINI",
+            "alias": "primary",
+            "key_id": "bbecfb04dcd925eb",
+            "limit": 1000000,
+            "limit_source": {
+              "limit": 1000000,
+              "provider": "gemini",
+              "notes": "Primary Gemini key quota"
+            },
+            "source": "GEMINI_API_KEY",
+            "note": "Clave API principal"
+          }
+        ],
+        "limits_source": "api_key_limits.json or API_KEY_LIMITS env"
+      }
+    },
+    "f7cf22cfe220:host:app": {
+      "environment": {
+        "environment_id": "f7cf22cfe220:host:app",
+        "environment_name": "f7cf22cfe220",
+        "user": "unknown",
+        "env_type": "host",
+        "container_id": null,
+        "path": "/app",
+        "timestamp": "2026-06-14T07:11:15.616224Z"
+      },
+      "hermes": {
+        "installed": true,
+        "version": "Hermes Agent v0.16.0 (2026.6.5) · upstream dc467488",
+        "provider": "gemini",
+        "model_default": "gemini-3.5-flash",
+        "base_url": "https://generativelanguage.googleapis.com/v1beta/openai",
+        "gateway": "telegram_not_configured"
+      },
+      "system": {
+        "os_name": "Ubuntu 24.04.4 LTS",
+        "os_version": "24.04.4 LTS (Noble Numbat)",
+        "packages_checked": [
+          {
+            "package": "curl",
+            "status": "installed"
+          },
+          {
+            "package": "git",
+            "status": "installed"
+          },
+          {
+            "package": "python3",
+            "status": "installed"
+          },
+          {
+            "package": "python3-venv",
+            "status": "installed"
+          },
+          {
+            "package": "python3-pip",
+            "status": "installed"
+          },
+          {
+            "package": "npm",
+            "status": "installed"
+          },
+          {
+            "package": "xz-utils",
+            "status": "installed"
+          },
+          {
+            "package": "ca-certificates",
+            "status": "installed"
+          }
+        ],
+        "required_packages": [
+          "curl",
+          "git",
+          "python3",
+          "python3-venv",
+          "python3-pip",
+          "npm",
+          "xz-utils",
+          "ca-certificates"
+        ]
+      },
+      "git": {
+        "branch": null,
+        "commit": null,
+        "message": null,
+        "status": {
+          "modified": 0,
+          "untracked": 0,
           "ahead": 0,
           "behind": 0
         }

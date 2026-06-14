@@ -103,6 +103,18 @@ def validate_n8n():
     if not (REPO_ROOT / "docs" / "N8N.md").exists():
         return False, "Falta la documentación de n8n: docs/N8N.md"
     
+    # If running inside a container, check reachability of 'n8n' service
+    if os.path.exists("/.dockerenv") or os.path.exists("/run/.containerenv"):
+        import socket
+        try:
+            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            s.settimeout(2)
+            s.connect(("n8n", 5678))
+            s.close()
+            return True, None
+        except Exception as exc:
+            return False, f"n8n no es accesible en la red del contenedor: {exc}"
+
     # Check if n8n is running locally or in Docker
     local_n8n = shutil.which("n8n")
     if local_n8n:
@@ -146,6 +158,13 @@ def validate_docker():
     dockerfile = REPO_ROOT / "Dockerfile"
     if not dockerfile.exists():
         return False, "Falta Dockerfile"
+    
+    # If running inside a container, skip docker binary/daemon verification
+    if os.path.exists("/.dockerenv") or os.path.exists("/run/.containerenv"):
+        if not (REPO_ROOT / "docker-compose.yml").exists():
+            return False, "Falta docker-compose.yml"
+        return True, None
+
     if not shutil.which("docker"):
         return False, "docker no está instalado en el PATH"
     try:

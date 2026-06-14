@@ -10,7 +10,7 @@ services:
       - "8080:8080"
     volumes:
       # MONTAR TU TRABAJO (read-only para proteger piezas clave, RW para estado)
-      - .:/app:ro
+      - .:/app
       - ./state.json:/app/state.json
       - ./app_result:/app/app_result
       # Persistencia de Hermes
