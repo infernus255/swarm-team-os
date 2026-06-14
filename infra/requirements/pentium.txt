@@ -1,0 +1,7 @@
+# Requirements for Pentium Mayordomo Node
+# Ultra-lightweight, focus on SGA management
+
+-r base.txt
+psutil
+psycopg2-binary
+pgvector

@@ -1,0 +1,7 @@
+# Requirements for Ryzen Muscle Node
+# Includes base + potential local inference libraries
+
+-r base.txt
+# psutil
+# torch --index-url https://download.pytorch.org/whl/cu118 (optional for future local LLM)
+# onnxruntime-gpu (optional)

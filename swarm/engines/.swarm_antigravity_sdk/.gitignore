@@ -1,0 +1,32 @@
+# Python bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environments
+.venv/
+venv/
+ENV/
+env/
+
+# Configuration and secrets
+.env
+.env.local
+
+# Results
+# Ignore generated app code inside the template folder (the real output goes to the project root)
+app_result/src/
+app_result/deploy/
+app_result/docs/competitive_audit.md
+app_result/tests/specs/
+app_result/states/
+app_result/logs/
+app_result/tdp/
+app_result/bsp/
+app_result/architecture/
+app_result/PROJECT_MANIFEST.md
+app_result/BOARD.md
+
+# OS files
+.DS_Store
+Thumbs.db

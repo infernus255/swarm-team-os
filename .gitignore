@@ -5,6 +5,8 @@
 hermes.env
 config/*.env
 .harness_lock
+docs/oracle-cloud/*.key
+docs/oracle-cloud/*.pem
 
 # Python
 __pycache__/
@@ -24,6 +26,8 @@ app_result/
 # state.json se mantiene si se desea versionar la telemetría base, 
 # pero usualmente se ignora. Lo dejaré comentado por si quieres ignorarlo:
 # state.json
+autonomous-swarm/
+hermes-test/
 
 # Herramientas de IDE
 .vscode/

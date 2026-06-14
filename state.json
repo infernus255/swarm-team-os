@@ -1,14 +1,13 @@
 {
-  "timestamp": "2026-06-07T09:21:11.197983Z",
-  "current_environment_id": "codespaces-16ec44:host:hermes-test",
+  "timestamp": "2026-06-14T23:15:00.000Z",
+  "current_environment_id": "GLOBAL_ORCHESTRATOR",
   "environment": {
-    "environment_id": "codespaces-16ec44:host:hermes-test",
-    "environment_name": "codespaces-16ec44",
-    "user": "codespace",
-    "env_type": "host",
-    "container_id": null,
-    "path": "/workspaces/hermes-test",
-    "timestamp": "2026-06-07T07:11:00.863099Z"
+    "environment_id": "GLOBAL_ORCHESTRATOR",
+    "environment_name": "SwarmTeam-OS-Unified",
+    "user": "admin",
+    "env_type": "orchestrator",
+    "path": "./",
+    "timestamp": "2026-06-14T23:15:00.000Z"
   },
   "environments": {
     "codespaces-16ec44:host:hermes-test": {
@@ -17,8 +16,8 @@
         "environment_name": "codespaces-16ec44",
         "user": "codespace",
         "env_type": "host",
-        "path": "C:\\Users\\admin\\source\\repos\\hermes-test",
-        "timestamp": "2026-06-07T09:21:11.197983Z"
+        "path": "/workspaces/hermes-test",
+        "timestamp": "2026-06-07T07:11:00.863099Z"
       },
       "hermes": {
         "installed": true,
@@ -34,9 +33,9 @@
         "driver_extensions": {}
       },
       "git": {
-        "branch": "'git' is not recognized as an internal or external command,\noperable program or batch file.",
-        "commit": "'git' is not recognized as an internal or external command,\noperable program or batch file.",
-        "message": "'git' is not recognized as an internal or external command,\noperable program or batch file.",
+        "branch": "main",
+        "commit": "883dc9b47438194ef392821a5b11079853fd8039",
+        "message": "Initial commit: SwarmTeam OS Unified Architecture",
         "status": {
           "modified": 2,
           "untracked": 2,
@@ -44,6 +43,24 @@
           "behind": 0
         }
       }
+    },
+    "PENTIUM_MAYORDOMO_LOCAL": {
+      "status": "OFFLINE",
+      "role": "Local Anchor / SGA Database / OCI Hunter",
+      "specs": "Pentium / 16 GB RAM / 120 GB SSD",
+      "last_sync": null
+    },
+    "ORACLE_CLOUD_SA_SANTIAGO": {
+      "status": "AWAITING_PROVISIONING",
+      "role": "Public Gateway / Telegram Bot",
+      "specs": "4 OCPU / 24 GB RAM / 200 GB Disk",
+      "last_sync": null
+    },
+    "RYZEN_MUSCLE_DESKTOP": {
+      "status": "OFFLINE",
+      "role": "Heavy Compute / Local LLM / GPU Inference",
+      "specs": "Ryzen 3600X / 16 GB RAM / RX 5600XT",
+      "last_sync": null
     }
   }
 }

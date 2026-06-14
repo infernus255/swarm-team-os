@@ -1,4 +1,4 @@
-# Contributing to hermes-test
+# Contributing to SwarmTeam OS
 
 This repository is organized around reproducible skills and root-level shared state.
 
@@ -17,6 +17,6 @@ This repository is organized around reproducible skills and root-level shared st
 
 ## Notes
 
-- Keep `state.json` at the repository root.
-- Keep API budget and key limit files at root: `api_budget.json`, `api_key_limits.example.json`.
+- Keep `state.json` at the repository root as the Global Ledger.
+- Keep API orchestrator and key limit files in `config/`.
 - Do not hand-edit generated docs and state files unless the change is the direct result of the scripts.

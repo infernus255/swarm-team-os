@@ -1,0 +1,14 @@
+﻿{
+  "project_id": "",
+  "current_phase": "M0_FOUNDATION",
+  "status": "PENDING",
+  "user_prompt": "",
+  "project_goal": "",
+  "history": [],
+  "artifacts": {},
+  "pending_human_review": {},
+  "errors_encountered": [],
+  "final_product": {},
+  "currentNode": "M0",
+  "workflow_mode": "greenfield"
+}

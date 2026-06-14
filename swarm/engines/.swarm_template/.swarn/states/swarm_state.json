@@ -1,0 +1,18 @@
+{
+  "project_id": "",
+  "current_phase": "M0_FOUNDATION",
+  "status": "PENDING",
+  "user_prompt": "",
+  "project_goal": "",
+  "history": [
+    {
+      "to": "M1",
+      "timestamp": "2026-05-09T07:02:51.238Z"
+    }
+  ],
+  "artifacts": {},
+  "pending_human_review": {},
+  "errors_encountered": [],
+  "final_product": {},
+  "currentNode": "M1"
+}

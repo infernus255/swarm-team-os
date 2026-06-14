@@ -1,8 +1,9 @@
 import asyncio
 import os
 from typing import Any, Dict
+from pathlib import Path
 from core.orchestrator import GraphRunner
-
+from core.engine_selector import EngineSelector
 from memory.sga_client import sga_client
 
 class JarvisAssistant:
@@ -13,6 +14,7 @@ class JarvisAssistant:
     
     def __init__(self):
         self.swarm_runner = GraphRunner()
+        self.engine_selector = EngineSelector(Path.cwd())
 
     async def handle_request(self, prompt: str):
         print(f"--- Jarvis analizando: '{prompt}' ---")
@@ -24,7 +26,17 @@ class JarvisAssistant:
         if any(keyword in prompt.lower() for keyword in ["crear", "app", "desarrollar", "proyecto", "swarm"]):
             print("🤖 [Modo Swarm]: Requerimiento de desarrollo detectado.")
             mode = "SWARM"
-            result = await self.swarm_runner.run(prompt)
+            selected_engine = self.engine_selector.select_engine(prompt)
+            print(f"🤖 [Engine Selector]: Selected Swarm Engine '{selected_engine}'")
+            
+            try:
+                result = await self.engine_selector.execute_engine(selected_engine, prompt)
+                if result.get("status") == "ERROR":
+                    print("⚠️ [Jarvis]: Swarm Engine execution failed, falling back to local GraphRunner...")
+                    result = await self.swarm_runner.run(prompt)
+            except Exception as e:
+                print(f"⚠️ [Jarvis]: Exception during Swarm Engine execution: {e}. Falling back to local GraphRunner...")
+                result = await self.swarm_runner.run(prompt)
         else:
             print("🖥️ [Modo OS]: Requerimiento operativo detectado.")
             result = await self.execute_os_skill(prompt)

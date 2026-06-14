@@ -1,0 +1,23 @@
+﻿[project]
+name = "swarn-fastapi"
+version = "1.0.0"
+description = "PydanticAI-powered sequential multi-agent pipeline (SWARN)"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi>=0.115.0",
+    "uvicorn[standard]>=0.34.0",
+    "pydantic>=2.10.0",
+    "pydantic-ai>=0.1.0",
+    "pydantic-settings>=2.7.0",
+    "typer>=0.15.0",
+    "websockets>=14.0",
+    "openai>=1.55.0",
+    "anthropic>=0.47.0",
+    "rich>=13.9.0",
+]
+
+[project.scripts]
+swarn = "app.cli.commands:app"
+
+[tool.pyright]
+typeCheckingMode = "strict"

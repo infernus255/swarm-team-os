@@ -17,10 +17,17 @@ RUN apt-get update \
 RUN curl -fsSL https://raw.githubusercontent.com/NousResearch/hermes-agent/main/scripts/install.sh | bash
 
 ENV PATH="/root/.local/bin:/root/.hermes/hermes-agent/venv/bin:$PATH"
-WORKDIR /root
+WORKDIR /app
+
+# Instalar dependencias de Python del proyecto
+COPY requirements.txt .
+RUN pip3 install --no-cache-dir -r requirements.txt --break-system-packages
 
 COPY infra/hermes/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+
+# Copiar el código base (será sobrescrito por volúmenes en dev, pero útil para prod)
+COPY . .
 
 EXPOSE 9119
 ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]

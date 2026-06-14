@@ -1,0 +1,30 @@
+{
+    "orchestrator": {
+        "default_thinking_model": "groq/llama-3.3-70b",
+        "fallback_model": "sambanova/llama-3.3-70b",
+        "heavy_lifting_model": "gemini/flash-1.5",
+        "coding_model": "groq/llama-3.3-70b"
+    },
+    "routing_rules": [
+        {
+            "task_type": "vision",
+            "provider": "gemini",
+            "reason": "Mejor capacidad multimodal"
+        },
+        {
+            "task_type": "brainstorming",
+            "provider": "groq",
+            "reason": "Máxima velocidad (70B) a bajo coste"
+        },
+        {
+            "task_type": "long_context",
+            "provider": "gemini",
+            "reason": "Ventana de contexto de 1M+ tokens"
+        }
+    ],
+    "token_savings": {
+        "summarize_history_above_tokens": 4000,
+        "strip_comments_from_code_context": true,
+        "max_output_tokens": 1024
+    }
+}
