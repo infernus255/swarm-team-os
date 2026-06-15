@@ -6,6 +6,8 @@ hermes.env
 config/*.env
 .harness_lock
 state.json
+application_requirement_prompt.md
+.swarn/
 
 # Python
 **/__pycache__/

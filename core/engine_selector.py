@@ -72,10 +72,11 @@ class EngineSelector:
         """Executes the selected engine subprocess, passing application_requirement_prompt.md."""
         engine_path = self.engines_dir / engine_name
         
-        # 1. Write the application requirement prompt in the project root
-        requirement_file = self.repo_root / "application_requirement_prompt.md"
+        # 1. Write the application requirement prompt in app_result
+        requirement_file = self.repo_root / "app_result" / "application_requirement_prompt.md"
+        requirement_file.parent.mkdir(parents=True, exist_ok=True)
         requirement_file.write_text(f"# Application Requirement\n\n{prompt}\n", encoding="utf-8")
-        print(f"[*] Prompt written to {requirement_file}")
+        print(f"[*] Prompt written to {requirement_file.relative_to(self.repo_root)}")
 
         # 2. Check if .swarm_copilot is selected
         if engine_name == ".swarm_copilot":
