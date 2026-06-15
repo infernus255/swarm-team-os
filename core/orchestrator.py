@@ -37,11 +37,14 @@ class GraphRunner:
         
         print(f"🚀 [Orchestrator] Iniciando SwarmTeam OS para: {self.state['project_id']}")
         
+        from core.graph import analyst_node, bsp_node, coder_node, qa_node, benchmarking_node, devops_node
+
         nodes: Dict[str, Callable] = {
             "M0": analyst_node,
             "M2": bsp_node,
             "M5": coder_node,
             "M4": qa_node,
+            "M4b": benchmarking_node,
             "M6": devops_node
         }
 
@@ -90,10 +93,8 @@ class GraphRunner:
             elif current == "M5": current = "M4"
             elif current == "M4":
                 from core.graph import qa_check_edge
-                next_node = qa_check_edge(self.state)
-                if next_node == "M6": current = "M6"
-                elif next_node == "M5": current = "M5"
-                else: current = "END"
+                current = qa_check_edge(self.state)
+            elif current == "M4b": current = "M6"
             elif current == "M6": current = "END"
 
         print(f"✅ [Orchestrator] Proceso Finalizado. Estado Final: {self.state['status']}")

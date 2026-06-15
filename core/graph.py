@@ -83,10 +83,40 @@ async def qa_node(state: GraphState) -> GraphState:
         
     return state
 
+async def benchmarking_node(state: GraphState) -> GraphState:
+    print(f"--- [M4b] Benchmarking: Midiendo Rendimiento ---")
+    source_path = Path("app_result/src/main.py")
+    
+    if not source_path.exists():
+        state["status"] = Status.DONE
+        return state
+
+    import time
+    import subprocess
+    
+    start_time = time.time()
+    try:
+        # Run the generated code and measure time
+        result = subprocess.run(["python3", str(source_path)], capture_output=True, timeout=5)
+        duration = time.time() - start_time
+        print(f"⏱️ Ejecución completada en {duration:.4f}s")
+        
+        state["artifacts"]["benchmarking"] = f"Duration: {duration:.4f}s"
+        
+        # Elite Standard: if duration > 1s for a hello world, it's inefficient (just an example)
+        if duration > 1.0:
+            print("⚠️ Advertencia: Rendimiento por debajo de los estándares Elite.")
+            
+    except Exception as e:
+        print(f"⚠️ No se pudo realizar el benchmark: {e}")
+    
+    state["status"] = Status.DONE
+    return state
+
 def qa_check_edge(state: GraphState) -> str:
-    """Decide si avanzar a M6 o volver a M5 para corregir."""
+    """Decide si avanzar a M4b o volver a M5 para corregir."""
     if state["status"] == Status.DONE:
-        return "M6"
+        return "M4b"
     elif state["iteration_count"] < 3: # Límite de 3 reintentos auto-correctivos
         print(f"🔄 Reintentando corrección (Intento {state['iteration_count']}/3)...")
         return "M5"

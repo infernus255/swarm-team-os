@@ -7,6 +7,8 @@ from pathlib import Path
 from typing import Dict, Any, Optional
 from memory.sga_client import sga_client
 
+from core.providers.llm import llm_provider
+
 class EngineSelector:
     """Selects and executes the best Swarm engine for a given task."""
     
@@ -14,8 +16,24 @@ class EngineSelector:
         self.repo_root = repo_root or Path.cwd()
         self.engines_dir = self.repo_root / "swarm" / "engines"
 
-    def select_engine(self, prompt: str) -> str:
-        """Selects engine folder name based on keywords. Returns the folder name."""
+    async def select_engine(self, prompt: str) -> str:
+        """Selects engine folder name based on intelligent classification."""
+        print("🧠 [Engine Selector]: Classifying task with Tier 1 LLM...")
+        classification = await llm_provider.classify_task(prompt)
+        
+        engine_name = classification.get("selected_engine")
+        reason = classification.get("reason", "No reason provided.")
+        complexity = classification.get("complexity", "medium")
+        
+        print(f"🎯 [Engine Selector]: Selected {engine_name} (Complexity: {complexity})")
+        print(f"📝 [Engine Selector]: Reason: {reason}")
+
+        # Validation: check if the folder exists
+        if engine_name and (self.engines_dir / engine_name).exists():
+            return engine_name
+
+        # Fallback to keyword matching if LLM failed or suggested non-existent engine
+        print("⚠️ [Engine Selector]: Intelligent classification failed or engine not found. Falling back to keyword matching.")
         prompt_lower = prompt.lower()
         if any(k in prompt_lower for k in ["antigravity", "gemini sdk", "google sdk", "google-antigravity"]):
             return ".swarm_antigravity_sdk"

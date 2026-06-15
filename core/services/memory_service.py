@@ -2,6 +2,7 @@ import hashlib
 import json
 import sys
 import psycopg2
+from datetime import datetime
 from typing import Any, Dict, Optional, List
 from core.config import settings
 from core.providers.embeddings import EmbeddingProvider, GeminiEmbeddingProvider
@@ -136,3 +137,18 @@ class MemoryService:
         except Exception as e:
             print(f"[MemoryService] Global query error: {e}", file=sys.stderr)
             return "Error querying global memory."
+
+    def get_last_phase_execution(self, project_id: str, phase: str) -> Optional[datetime]:
+        """Returns the timestamp of the last time a phase was executed for a project."""
+        try:
+            conn = self._get_connection()
+            with conn.cursor() as cur:
+                cur.execute("""
+                    SELECT created_at FROM sga_l0_context 
+                    WHERE project_id = %s AND phase = %s 
+                    ORDER BY created_at DESC LIMIT 1;
+                """, (project_id, phase))
+                row = cur.fetchone()
+                return row[0] if row else None
+        except Exception:
+            return None

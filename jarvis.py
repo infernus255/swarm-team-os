@@ -1,6 +1,8 @@
 import asyncio
 import sys
 import os
+import subprocess
+from datetime import datetime, timezone
 from pathlib import Path
 
 # Add current dir to sys.path
@@ -25,12 +27,37 @@ class JarvisAssistant:
         else:
             print(f"✅ [Jarvis] Version up-to-date: v{settings.version}")
 
+    async def _auto_maintenance(self):
+        """Perform automatic maintenance tasks like Guru-Watch."""
+        last_run = self.memory.get_last_phase_execution("SYSTEM_CORE", "GURU_WATCH")
+        
+        # Check if more than 7 days have passed since the last run
+        should_run = False
+        if not last_run:
+            should_run = True
+        else:
+            # Ensure last_run is offset-aware for comparison
+            if last_run.tzinfo is None:
+                last_run = last_run.replace(tzinfo=timezone.utc)
+            delta = datetime.now(timezone.utc) - last_run
+            if delta.days >= 7:
+                should_run = True
+        
+        if should_run:
+            print("🕵️ [Jarvis] Triggering scheduled Guru-Watch...")
+            env = os.environ.copy()
+            env["PYTHONPATH"] = os.getcwd() + os.pathsep + env.get("PYTHONPATH", "")
+            subprocess.run([sys.executable, "harness/scripts/skill_guru_watch.py"], env=env)
+
     async def handle_request(self, prompt: str):
         print(f"--- Jarvis analizando: '{prompt}' ---")
         
+        # Run maintenance tasks
+        await self._auto_maintenance()
+        
         # Decision Logic
         if any(keyword in prompt.lower() for keyword in ["crear", "app", "swarm"]):
-            engine = self.engine_selector.select_engine(prompt)
+            engine = await self.engine_selector.select_engine(prompt)
             result = await self.engine_selector.execute_engine(engine, prompt)
         else:
             result = {"status": "SUCCESS", "details": f"OS task '{prompt}' completed."}
