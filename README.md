@@ -1,38 +1,38 @@
-# 🤖 SwarmTeam OS: Multi-Agent Pipeline Framework
+# 🤖 SwarmTeam OS: Elite v3.0
 
-Bienvenido al sistema unificado de ingeniería autónoma **SwarmTeam**. Este repositorio es un framework agnóstico, determinista y con memoria de largo plazo diseñado para la creación de aplicaciones mediante pipelines multi-agente.
+Distributed Agentic OS for Multi-Node Swarms (Poly-Swarm). Optimized for 2026 Agentic Engineering standards, featuring centralized memory alignment (SGA) and autonomous self-improvement.
 
-## 🏗️ Arquitectura Unificada (Clean Architecture)
-El sistema se organiza bajo el principio de **Separación de Responsabilidades** para maximizar la eficiencia de tokens y minimizar alucinaciones:
+## 🚀 Vision
+SwarmTeam OS is not just a framework; it's a distributed operating system where **Jarvis** (The Dispatcher) orchestrates specialized **Swarm Engines** across multiple hardware nodes (Pentium, Ryzen, Oracle Cloud). It is built on the principles of **Spec-Driven Development (SDD)** and **Harness Engineering**.
 
-- **`core/`**: El Motor (Stateful Graph Engine). Contiene la lógica del grafo cíclico y los modelos únicos (`models.py`).
-- **`swarm/`**: La Inteligencia. Prompts maestros y reglas de diseño (Spec-Driven Development).
-- **`harness/`**: El Chasis (Hardware/OS). Gestiona la telemetría del entorno (`state.json`), Git, Docker y skills personalizadas.
-- **`memory/`**: El Cerebro. Cliente de integración con el **Semantic Graph Agent (SGA)** para persistencia vectorial en Neon DB.
+## 核心 (Core Components)
+- **`core/`**: The brain. Includes `GraphRunner` for cyclic orchestration and `EngineSelector` for dynamic engine invocation.
+- **`swarm/blueprints/`**: The "SwarmMaster" prompts and requirement templates.
+- **`memory/`**: The **SGA (Shared Global Alignment)** layer, connecting all nodes to a centralized Neon PostgreSQL + pgvector database.
+- **`harness/scripts/`**: Deterministic skills for Git, Docker, and the new **Guru-Watch** protocol.
 
-## 🚀 Inicio Rápido (MVP)
-Para lanzar el ciclo de desarrollo autónomo:
+## 📖 Agentic Engineering Bible
+The system follows the strict guidelines in `docs/architecture_insights.md`, which integrates best practices from Nous Hermes, Pydantic-AI, and Google Antigravity.
 
-1. Asegúrate de tener configurado tu `hermes.env` con tu `GEMINI_API_KEY`.
-2. Ejecuta el orquestador:
-```bash
-python main.py "Crear una aplicación de gestión de inventario"
-```
+## 🕵️ Guru-Watch Protocol
+SwarmTeam OS is self-updating. Via `harness/scripts/skill_guru_watch.py`, the system autonomously:
+1. Crawls industry leader repositories for latest best practices.
+2. Indexes insights into the **SGA L1 Knowledge Layer**.
+3. Updates core architectural guidelines to prevent obsolescence.
 
-## 🧠 Ciclo de Vida del Desarrollo (SDD)
-El sistema sigue un pipeline secuencial contractuado, pero capaz de ciclos de retroalimentación:
-1.  **M0**: Análisis de Requerimientos.
-2.  **M2**: Definición de Reglas de Negocio (BSP).
-3.  **M3**: Diseño de Arquitectura.
-4.  **M4**: Ingeniería de QA (Tests).
-5.  **M5**: Generación de Código (con bucle de auto-corrección M4-M5).
-6.  **M6**: DevOps e Infraestructura.
+## 🛠️ Quick Start
+1. **Initialize Environment:**
+   ```bash
+   bash infra/universal-setup.sh
+   ```
+2. **Configure SGA:** Set your `DATABASE_URL` in `hermes.env`.
+3. **Run Jarvis:**
+   ```bash
+   python jarvis.py "Your request here"
+   ```
 
-## 🛠️ Skills del Harness
-Puedes invocar habilidades deterministas desde el celular (vía Telegram) o CLI:
-- `skill_state.py`: Telemetría de hardware y salud del sistema.
-- `skill_docker.py`: Control de contenedores y parsing de Dockerfiles.
-- `skill_commit_push.py`: Validación integral y sincronización con GitHub.
+## 🛡️ Regression Control
+Every core change is validated against `tests/test_swarm_core.py` to ensure architectural integrity and prevent regressions in the dispatcher logic.
 
 ---
-**Mantenimiento:** Este repositorio se autogestiona mediante reglas estrictas de Anti-Drift. No modifiques las especificaciones en `app_result/` sin pasar por el flujo de diseño correspondiente.
+*SwarmTeam OS: The future of autonomous, distributed intelligence.*

@@ -80,10 +80,16 @@ class EngineSelector:
                 }
 
         # 3. Setup subprocess environment
+        from core.config import settings
         env = os.environ.copy()
         # Set project root env vars so engine knows where to output app_result
         env["SWARM_PROJECT_ROOT"] = str(self.repo_root)
         env["SWARN_PROJECT_ROOT"] = str(self.repo_root)
+        
+        # Inject Model Tiers
+        env["TIER1_MODEL"] = settings.model_tier1
+        env["TIER2_MODEL"] = settings.model_tier2
+        env["TIER3_MODEL"] = settings.model_tier3
         
         # Set PYTHONPATH so absolute app/ imports work inside subprocesses
         env["PYTHONPATH"] = str(engine_path) + os.pathsep + env.get("PYTHONPATH", "")

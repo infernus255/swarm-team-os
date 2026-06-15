@@ -1,25 +1,29 @@
-# 🗺️ REPO MAP CACHE (v1.0)
-# Jarvis: Usa este archivo para conocer la estructura sin listar directorios.
+# 🗺️ REPO MAP ELITE (v3.0)
 
 .
 ├── config/
 │   ├── api_orchestrator.json     # Ruteo inteligente de LLMs
-│   └── api_budget.json           # Límites de gasto
+│   └── api_budget.json           # Límites de gasto (FinOps)
 ├── core/
-│   ├── graph.py                  # Lógica de estados del Swarm
-│   ├── orchestrator.py           # Cerebro de Jarvis
-│   └── models.py                 # Contratos Pydantic
-├── env_drivers/
-│   ├── pentium_mayordomo.py      # Lógica para hardware débil
-│   ├── local_desktop.py          # Lógica para Ryzen/Notebook
-│   └── codespaces_cloud.py       # Lógica para desarrollo nube
+│   ├── orchestrator.py           # Brain (GraphRunner + SGA Sync)
+│   ├── engine_selector.py        # Dispatcher de Motores Poly-Swarm
+│   ├── graph.py                  # Definición de Nodos del Grafo
+│   └── services/
+│       └── memory_service.py     # Conector Neon DB (L0/L1)
+├── docs/
+│   ├── architecture_insights.md  # La Biblia Agéntica (Guru-Watch)
+│   └── ...                       # Handoffs y Guías
 ├── harness/
-│   ├── scripts/                  # Skills (Git, Docker, Antigravity)
-│   └── docs/                     # Reglas SDD
+│   └── scripts/
+│       ├── skill_guru_watch.py   # Auto-update de conocimiento
+│       ├── skill_state.py        # Telemetría de hardware
+│       └── ...                   # Skills Git/Docker
 ├── infra/
-│   ├── universal-setup.sh        # Instalador automático
-│   └── hermes/                   # Docker entrypoints
+│   ├── universal-setup.sh        # Instalador agnóstico
+│   └── db_init.py                # Inicializador SGA
 ├── memory/
-│   └── sga_client.py             # Conector de memoria Postgres
-└── swarm/
-    └── blueprints/               # Prompts maestros agnósticos
+│   └── sga_client.py             # Proxy de memoria core
+├── swarm/
+│   ├── engines/                  # Workforce (Motores especializados)
+│   └── blueprints/               # Master Prompts (v3.0)
+└── tests/                        # Regression Control Suite

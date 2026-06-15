@@ -35,6 +35,11 @@ class Settings:
         self.env_tier = os.getenv("ENV_TIER", "DEV")
         self.version = self._get_version()
 
+        # AI Model Tiers (FinOps Cascading - 2026 Standards)
+        self.model_tier1 = os.getenv("TIER1_MODEL", "gemini-3.5-flash") # Efficient Routing / Small Tasks
+        self.model_tier2 = os.getenv("TIER2_MODEL", "gemini-3.1-flash-lite") # Context-rich fast reasoning
+        self.model_tier3 = os.getenv("TIER3_MODEL", "gemini-3.5-pro") # Elite Coding / Architecture
+
     def _get_version(self) -> str:
         version_file = self.repo_root / "VERSION"
         return version_file.read_text().strip() if version_file.exists() else "0.0.0"

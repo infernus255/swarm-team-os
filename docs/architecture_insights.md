@@ -1,41 +1,44 @@
-# Gu├¡a de Insights de Arquitectura para la Auto-Evoluci├│n del Sistema
-> **Nota para los Agentes de IA:** Lee este documento detenidamente antes de modificar cualquier l├¡nea de c├│digo del repositorio. Define las restricciones f├¡sicas y operativas de este ecosistema h├¡brido.
+# 🧠 AGENTIC ENGINEERING BIBLE (v1.0 - 2026 Standards)
+
+Este documento es el núcleo de conocimiento de SwarmTeam OS. Integra los principios de Nous Hermes, Pydantic-AI, Antigravity y las mejores prácticas de los "gurus" de AI Engineering.
+
+## 🏛️ 1. PRINCIPIOS ARQUITECTÓNICOS (SGA-Core)
+
+### A. Orquestación Basada en Grafos Cíclicos
+*   **No más flujos lineales:** El sistema debe operar en grafos donde el Agente M4 (Evaluador) puede devolver el flujo al Agente M5 (Codificador) hasta que se cumpla la rúbrica.
+*   **Desacoplamiento Total:** Los agentes no conocen la implementación de otros. Se comunican mediante **Contratos Tipados (Pydantic)** y la **SGA (Shared Global Alignment)**.
+
+### B. Memoria Dual (L0/L1) y JIT Context
+*   **L0 (Meta-State):** Estado del hardware y la conversación. No contamina la lógica de ingeniería.
+*   **L1 (Domain Knowledge):** Conocimiento técnico atomizado. Cada "insight" de un swarm debe ser indexado para ser inyectado como **Just-in-Time Context** en futuras ejecuciones.
+*   **Principio Guru:** "No rellenes el prompt con basura; inyecta solo lo necesario cuando el agente llame a una herramienta."
+
+### C. SDD (Spec-Driven Development)
+*   El código es un subproducto de la especificación. Si falla el código, primero se audita el `BSP.md` o el `ARCHITECTURE.md`.
+*   **Gatekeeping:** El Agente M4 (QA) es el dueño de la verdad. Si no hay tests unitarios exitosos, el proyecto no existe.
+
+## 🛠️ 2. HARNESS ENGINEERING & DETERMINISMO
+
+### A. Herramientas Estáticas vs. Estocásticas
+*   Usa exclusivamente herramientas CLI deterministas (`bash`, `python`, `git`).
+*   Cada acción del agente debe dejar un rastro en el **Observability Layer** (logs de ejecución y snapshots de Git).
+
+### B. Presupuestos de Agente (Safety & FinOps)
+*   **Step Budget:** Límite de iteraciones para evitar bucles infinitos.
+*   **Token Budget:** Límites de costo por tarea.
+*   **Time Budget:** Límites de tiempo real para sesiones autónomas.
+
+## 🧘 3. GURU-WATCH PROTOCOL (Auto-Mejora Continua)
+
+Para evitar la obsolescencia, SwarmTeam OS debe seguir este protocolo de actualización:
+
+1.  **Trigger Semanal:** El sistema debe ejecutar un "Research Swarm" buscando novedades en:
+    *   *Nous Research (Hermes Agent updates)*
+    *   *PydanticAI (Structured Output standards)*
+    *   *Antigravity (Swarm coordination patterns)*
+    *   *Publicaciones de Andrej Karpathy, Simon Willison y Anthropic Agents SDK.*
+2.  **Ingestión de "Insights":** Cada descubrimiento se vuelca en `docs/architecture_insights.md` y se atomiza en la SGA L1.
+3.  **Refactorización Sugerida:** Si una nueva práctica (ej. una nueva arquitectura de Router-Specialist) supera la actual, el sistema debe proponer un plan de migración al humano.
 
 ---
-
-## 1. Topolog├¡a del Entorno Operativo
-Este sistema funciona bajo un esquema descentralizado con una ├║nica fuente de verdad:
-
-[ Telegram Input ] -----v[ VS Code / Copilot ] --> [ Harness en Codespaces (Linux/Docker) ] --> [ GitHub Repo (Truth) ]^[ Nodos Locales (A/B) ] -/
-
-* **Entorno de Ejecuci├│n Actual:** GitHub Codespaces ejecutando una distribuci├│n de Linux en la nube.
-* **Advertencia de Docker en la Nube:** Al correr dentro de Codespaces, Docker opera bajo un esquema de *Docker-in-Docker* (DinD) o sockets compartidos. Los agentes deben asegurar que los vol├║menes configurados para persistencia de estados locales utilicen rutas relativas que no se destruyan al reiniciar o expirar el Codespace web.
-
----
-
-## 2. Peligros Cr├¡ticos del Modo Autopilot (Preview) con Raptor Mini
-El modo Autopilot de Copilot tiene permisos para autoevaluar herramientas, responder preguntas de bloqueo internas y continuar iterando sin confirmaci├│n humana directa.
-
-* **El Riesgo del "Bucle de Dinero/Cr├®ditos Quemados":** Al emparejar a Raptor Mini (optimizado para ediciones masivas multi-archivo) con un bucle aut├│nomo que se autogestiona, existe el riesgo de que una mala interpretaci├│n gramatical en el Prompt Engineering provoque que la IA reescriba 50 archivos de forma c├¡clica, evaporando el remanente de los cr├®ditos gratuitos en minutos.
-* **Mitigaci├│n:** Todo script generado para automatizar el bucle debe incluir un mecanismo de *Rate Limiting* por hardware o tiempo (ej. m├íximo 5 iteraciones seguidas antes de forzar un `sleep` de 60 segundos).
-
----
-
-## 3. Estrategia Multientorno y Flota de Agentes
-Cuando este repositorio se clone en diferentes entornos f├¡sicos (Computadora personal A, Computadora de pruebas B, Servidor en la nube):
-
-* Cada m├íquina debe inyectar una variable de entorno local llamada `AGENCY_NODE_ID` (ej: `DESKTOP-EROS-01`, `CODESPACE-WEB`).
-* Los cambios locales en los Skills que dependan de optimizaciones espec├¡ficas de hardware o sistemas operativos locales se manejar├ín a trav├®s de ramas (*branches*) separadas.
-* La consolidaci├│n de conocimientos de los diferentes entornos se gestionar├í de manera limpia mediante Pull Requests (PRs). Los agentes pueden abrir PRs de forma aut├│noma con los archivos `.md` de nuevos aprendizajes en la carpeta `/skills`, pero la fusi├│n final a `main` requiere control de calidad o validaci├│n integral de tests del sistema.
-
----
-
-## 4. Instrucciones de Uso
-
-1. Crea una carpeta llamada `harness/` y guarda all├¡ los dos primeros archivos (`skill_token_management.md` y `skill_harness_improvement.md`).
-2. Guarda el tercer archivo (`architecture_insights.md`) en la ra├¡z del repositorio.
-3. Abre el chat de Copilot en modo Autopilot Preview (con Raptor Mini seleccionado) o invoca a Hermes y diles:
-
-"Lean los archivos en `harness/` y el archivo `architecture_insights.md`. En base a esas directivas, programen el script de automatizaci├│n en Python o Node para inicializar la base de `config/api_budget.json` y configuren el interceptor de tokens para las API keys de Gemini 3.5 Flash".
-
-A partir de ah├¡, ambos modelos entender├ín perfectamente las reglas de juego, los l├¡mites de costos y c├│mo optimizarse mutuamente sin pisarse los cables.
+*Documento autogenerado por SwarmTeam OS Elite v2.1.*

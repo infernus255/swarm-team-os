@@ -1,15 +1,19 @@
 from __future__ import annotations
 
 import uuid
+import json
+import subprocess
 from datetime import datetime, timezone
 from typing import Any, Callable, Dict, List, Optional
 
 from core.models import Phase, Status, SwarmState, GraphState
-from core.graph import GraphState, analyst_node, bsp_node, coder_node, qa_node, devops_node
+from core.graph import analyst_node, bsp_node, coder_node, qa_node, devops_node
+from core.services.memory_service import MemoryService
 
 class GraphRunner:
-    def __init__(self, state: Optional[GraphState] = None):
+    def __init__(self, state: Optional[GraphState] = None, memory_service: Optional[MemoryService] = None):
         self.state = state or self._init_state()
+        self.memory = memory_service or MemoryService()
 
     def _init_state(self) -> GraphState:
         return {
@@ -31,7 +35,7 @@ class GraphRunner:
         self.state["user_prompt"] = initial_prompt
         self.state["project_goal"] = initial_prompt
         
-        print(f"🚀 Iniciando SwarmTeam OS para proyecto: {self.state['project_id']}")
+        print(f"🚀 [Orchestrator] Iniciando SwarmTeam OS para: {self.state['project_id']}")
         
         nodes: Dict[str, Callable] = {
             "M0": analyst_node,
@@ -41,7 +45,6 @@ class GraphRunner:
             "M6": devops_node
         }
 
-        # Flujo Dinámico basado en Grafo
         current = "M0"
         
         while current != "END" and self.state["status"] != Status.REJECTED:
@@ -52,10 +55,36 @@ class GraphRunner:
             if not node_func:
                 break
                 
-            self.state = await node_func(self.state)
-            self._log_transition(current)
+            # --- SNAPSHOT BEFORE ACTION ---
+            snapshot_msg = f"Snapshot before {current} for {self.state['project_id']}"
+            self._take_snapshot(snapshot_msg)
 
-            # Lógica de Enrutamiento Dinámico (Edges)
+            try:
+                self.state = await node_func(self.state)
+                self._log_transition(current)
+                
+                # PERSIST TO SGA
+                self.memory.push_memory(
+                    project_id=self.state["project_id"],
+                    phase=current,
+                    content=f"Phase {current} completed successfully.",
+                    metadata={"artifacts": self.state["artifacts"]}
+                )
+
+            except Exception as e:
+                print(f"❌ [Rollback]: Fallo en {current}. Revirtiendo cambios...")
+                self._rollback()
+                self.state["errors_encountered"].append({"node": current, "error": str(e)})
+                self.state["status"] = Status.ERROR
+                self.memory.push_memory(
+                    project_id=self.state["project_id"],
+                    phase=current,
+                    content=f"Phase {current} failed: {str(e)}",
+                    metadata={"error": True}
+                )
+                break
+
+            # Routing Logic
             if current == "M0": current = "M2"
             elif current == "M2": current = "M5"
             elif current == "M5": current = "M4"
@@ -63,11 +92,11 @@ class GraphRunner:
                 from core.graph import qa_check_edge
                 next_node = qa_check_edge(self.state)
                 if next_node == "M6": current = "M6"
-                elif next_node == "M5": current = "M5" # BUCLE DE CORRECCIÓN
+                elif next_node == "M5": current = "M5"
                 else: current = "END"
             elif current == "M6": current = "END"
 
-        print(f"✅ Proceso Finalizado. Estado Final: {self.state['status']}")
+        print(f"✅ [Orchestrator] Proceso Finalizado. Estado Final: {self.state['status']}")
         return self.state
 
     def _log_transition(self, node_id: str):
@@ -76,3 +105,22 @@ class GraphRunner:
             "timestamp": datetime.now(timezone.utc).isoformat(),
             "status": self.state["status"]
         })
+
+    def _take_snapshot(self, message: str):
+        try:
+            status = subprocess.check_output(["git", "status", "--porcelain"], text=True)
+            if not status.strip():
+                return
+
+            subprocess.run(["git", "add", "."], capture_output=True)
+            subprocess.run(["git", "commit", "-m", message], capture_output=True)
+            print(f"📸 [Snapshot]: Phase state saved to Git.")
+        except Exception:
+            pass
+
+    def _rollback(self):
+        try:
+            subprocess.run(["git", "reset", "--hard", "HEAD~1"], capture_output=True)
+            print(f"⏪ [Rollback]: Restored to last stable phase.")
+        except Exception:
+            pass

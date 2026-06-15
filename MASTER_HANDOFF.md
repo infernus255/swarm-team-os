@@ -1,89 +1,73 @@
-# 🤖 SWARMTEAM OS: MASTER ARCHITECTURE & HANDOFF (v3.0)
+# 🤖 SWARMTEAM OS: MASTER ARCHITECTURE & HANDOFF (v3.0 Elite)
 
-> **META-INSTRUCTION FOR ANY AI AGENT (ANTIGRAVITY, COPILOT, HERMES):** 
-> This is the ultimate source of truth for the `hermes-swarm` repository. You must adhere to the Spec-Driven Development (SDD) rules, the Poly-Swarm architecture, and the strict Token Efficiency guidelines outlined below. This repo contains BOTH the Jarvis OS logic and the Autonomous Swarm engines. They must learn, self-update, and communicate seamlessly regardless of who or what (User, Hermes, Copilot, Antigravity) triggers them.
-
----
-
-## 1. THE VISION: DISTRIBUTED, CONCURRENT AGENTic OS
-SwarmTeam OS is a multi-instance, distributed operating system. 
-- **Hermes (The Runtime):** The underlying agent framework installed on the machine. It receives triggers (CLI, Telegram, Webhook) and executes the Repo.
-- **Jarvis (The Intelligence/Dispatcher):** The `jarvis.py` script. It acts as the local brain. **Multiple Jarvis instances can run simultaneously across different nodes** (e.g., one on Oracle handling Telegram, one on the Pentium handling local tasks). They sync via the centralized SGA database and Git.
-- **Poly-Swarm (The Workforce):** Specialized engines (`swarm/engines/`) invoked by Jarvis for specific tasks (Copilot, Antigravity, PydanticAI).
+> **META-INSTRUCTION:** Este es el "Source of Truth" definitivo. Ningún agente debe operar fuera de estos parámetros. El sistema es un **OS Agentic Distribuido** diseñado para la máxima eficiencia de tokens y precisión de ingeniería.
 
 ---
 
-## 2. HARDWARE TOPOLOGY & MULTI-NODE CAPABILITIES
-The system adapts to its environment via `env_drivers/`. Each device has primary roles but can act as a Jarvis instance if needed:
+## 🏛️ 1. FILOSOFÍA: AGENTIC ENGINEERING & SDD
+SwarmTeam OS opera bajo el paradigma de **Spec-Driven Development (SDD)**. El código es un artefacto secundario; la especificación y la arquitectura son primarias.
+- **Hermes (The Runtime):** El framework de agente subyacente instalado en la máquina. Recibe disparadores (CLI, Telegram, Webhook) y ejecuta el Repo.
+- **Jarvis (The Intelligence/Dispatcher):** El script `jarvis.py`. Actúa como el cerebro local. **Múltiples instancias de Jarvis pueden correr simultáneamente en diferentes nodos** (ej. una en Oracle manejando Telegram, otra en el Pentium manejando tareas locales). Se sincronizan vía SGA y Git.
+- **Poly-Swarm (The Workforce):** Motores especializados en `swarm/engines/` (Copilot, Antigravity, PydanticAI) invocados por Jarvis para tareas específicas.
+- **Harness Engineering:** Uso de skills deterministas para interactuar con el mundo físico.
+
+---
+
+## 🚀 2. TOPOLOGÍA DE NODOS & CAPACIDADES (Elite Cluster)
+El sistema se adapta a su entorno vía `env_drivers/`. Cada dispositivo tiene roles primarios pero puede actuar como una instancia de Jarvis:
 
 1. **Oracle Cloud (The C2 / Public Gateway):** 
    - **Specs:** ARM Ampere (4 OCPU, 24GB RAM), Ubuntu 24.04.
-   - **Capabilities:** Always online Telegram webhook, orchestrator of heavy cloud swarms. The primary "Public Jarvis".
+   - **Capabilities:** Telegram webhook siempre online, orquestador de swarms pesados en la nube. El "Public Jarvis" primario.
 2. **Pentium (The Anchor / Local Mayordomo):**
-   - **Specs:** Low-resource local PC, 120GB SSD, Ubuntu Server.
-   - **Capabilities:** Hosts the local PostgreSQL+pgvector database (SGA). Runs the OCI Hunter (`cazador.py`). **Can run a local Jarvis instance** optimized for low-resource orchestration, routing heavy tasks to the Ryzen. Functions as the local network gateway/firewall.
+   - **Specs:** PC local de bajos recursos, 120GB SSD, Ubuntu Server.
+   - **Capabilities:** Host de la base de datos SGA (PostgreSQL+pgvector). Ejecuta el OCI Hunter (`cazador.py`). Gestiona el gateway/firewall local.
 3. **Ryzen Desktop (The Muscle / Battle Station):**
-   - **Specs:** Ryzen 3600X, RX 5600XT (6GB VRAM), 16GB RAM, 2TB Storage, Windows 11.
-   - **Capabilities:** Heavy local compute via Docker (invisible to gaming). Executes local LLM inference (Llama 3), heavy compilation, and media generation. The "Heavy Lifter Jarvis".
+   - **Specs:** Ryzen 3600X, RX 5600XT (6GB VRAM), 16GB RAM, Windows 11.
+   - **Capabilities:** Computación pesada vía Docker (invisible para gaming). Inferencia de LLM local, compilación pesada y generación de medios.
 4. **Notebook HP (The Mobile Lab / Media Library):**
    - **Specs:** i7 6th Gen, 16GB RAM, NVIDIA 940M, Pop!_OS / CachyOS.
-   - **Capabilities:** Portable dev station. Swarm testing ground. Can act as a media server managed by a local Jarvis instance.
+   - **Capabilities:** Estación de dev portátil. Banco de pruebas para Swarms. Servidor de medios gestionado por Jarvis.
 5. **Xiaomi 15 Ultra (The Mobile Sensor):**
-   - **Capabilities:** Voice commands, mobile dashboard access, biometric authentication for critical Swarm tasks, and fast image processing/vision input for Jarvis.
+   - **Capabilities:** Comandos de voz, acceso a dashboard móvil, autenticación biométrica para tareas críticas y procesamiento rápido de imágenes/visión.
 6. **MX9 Box (The Dashboard / TV Eye):**
-   - **Capabilities:** Runs a clean Android TV ROM (e.g., SlimBoxTV). Acts as a visual dashboard for the Swarm OS status and streams media orchestrated by the Notebook/Pentium.
-7. **GitHub Codespaces (Ephemeral Dev):**
-   - **Capabilities:** Used strictly for rapid IDE modifications to the Jarvis OS itself.
+   - **Capabilities:** Android TV (SlimBoxTV). Dashboard visual del estado del OS y streaming de medios orquestado por el Pentium/Notebook.
 
 ---
 
-## 3. BOOTSTRAPPING, SELF-UPDATING & RUNTIME FLOW
-
-### How Hermes understands the Repo (The Autorunner)
-Hermes is a generic agent runtime installed on the OS. It interacts with this repository via the `.clinerules` and execution scripts.
-1. **Trigger:** User speaks to Hermes on Telegram or CLI.
-2. **Boot:** Hermes reads the repo, identifies `jarvis.py` as the entry point based on `.clinerules` instructions, and executes it.
-3. **Context Awareness:** Jarvis uses `env_drivers/` to know *where* it is running (Pentium vs. Oracle) and reads `state.json` via the Harness to understand the global state.
-
-### Self-Updating Code & Swarm Invocation
-If the user asks Hermes (or Copilot/Antigravity) to *modify the OS or the Swarm*:
-1. The external AI modifies the Python files (`jarvis.py`, `core/`, `swarm/engines/`).
-2. The AI uses the Harness Git skills to commit and push.
-3. Other active Jarvis instances pull the latest Git changes before their next execution cycle. **The Repo is the source of truth.**
-
-### How Jarvis talks to the Swarm
-Jarvis does not hardcode Swarm logic. It uses a dynamic Engine Selector:
-1. Jarvis receives a task (e.g., "Build a React app").
-2. Jarvis looks in `swarm/engines/` and picks the best tool (e.g., `.swarm_antigravity_sdk`).
-3. Jarvis executes the Swarm engine as a sub-process, passing the `application_requirement_prompt.md`.
-4. The Swarm generates the app and writes L1 Memory (Technical Insights) to the SGA database.
+## 🧠 3. SISTEMA DE MEMORIA SGA (DUAL-LAYER)
+La memoria es el pegamento del sistema distribuido, alojada en **Neon PostgreSQL + pgvector**.
+- **L0 (Jarvis OS Meta-State):** 
+  - Almacena el estado de los nodos, contexto conversacional y preferencias del usuario.
+  - Trazabilidad de fases en `core/orchestrator.py`.
+- **L1 (Autonomous Swarm Knowledge):**
+  - Conocimiento técnico atomizado (coding paradigms, bug resolutions).
+  - **Guru-Watch Insights:** Novedades de la industria inyectadas automáticamente.
 
 ---
 
-## 4. DUAL-LAYER MEMORY SYSTEM & ALIGNMENT (SGA)
-The separation of memory ensures Jarvis and the Swarm don't corrupt each other, while both learning continuously.
-- **L0 Memory (Jarvis OS Meta-State):** Managed by Jarvis. Stores node statuses, Telegram conversations, user preferences, and "Which node is currently doing what".
-- **L1 Memory (Autonomous Swarm State):** Managed by the Swarm. Stores coding paradigms, bug resolutions, and framework-specific knowledge learned during tasks.
-- Both layers live in the **Pentium's PostgreSQL database**, but the repo configuration prevents Swarm tasks from polluting L0 conversational memory.
+## 🕵️ 4. GURU-WATCH & AUTO-MEJORA
+El sistema nunca queda obsoleto gracias al **Guru-Watch Protocol**:
+1. El script `harness/scripts/skill_guru_watch.py` monitorea repositorios de vanguardia (Nous Research, PydanticAI, Google Antigravity).
+2. Los descubrimientos se vuelcan en `docs/architecture_insights.md` (La Biblia Agéntica).
+3. Se inyectan en la SGA L1 para ser usados como **Just-in-Time Context** por cualquier enjambre.
 
 ---
 
-## 5. IMMEDIATE MIGRATION TASKS
-1. Move the legacy `.swarm_*` folders from the old repository into `hermes-swarm/swarm/engines/`.
-2. Refactor `jarvis.py` to implement the `Engine Selector` logic, allowing it to invoke the newly moved engines.
----
-
-## 8. MULTI-DEVICE STATE TRACKING (`state.json`)
-The `state.json` file is the **Global Ledger** of the OS. 
-- **Persistence Mandate:** This file MUST NOT be overwritten or wiped. New nodes must be appended to the `environments` dictionary.
-- **The Harness:** `harness/scripts/skill_state.py` is the only script authorized to update telemetries automatically.
-- **Legacy Context:** The `codespaces-16ec44` entry is the historical birth-node of the system and must be preserved as a reference for future cloud-init setups.
+## 🛡️ 5. PROTOCOLO DE CONTROL DE REGRESIONES & SEGURIDAD
+1. **Validation Gate:** Cada cambio en el `core/` debe pasar `tests/test_swarm_core.py`.
+2. **Agnostic Audit:** Prohibido inyectar lógica de producto en el core.
+3. **Snapshot Mandatory:** Cada transición de fase genera un commit de Git automático.
+4. **state.json Persistence:** El archivo `state.json` es el ledger global. **NUNCA debe ser sobrescrito o borrado.** Los nuevos nodos deben añadirse al diccionario `environments`.
+5. **Guardrails:** Nunca borrar documentación operacional o historial de estado. Leer `state.json` antes de proponer cambios.
 
 ---
 
-## 9. GUARDRAILS FOR AI AGENTS
-1. **Never Delete:** Do not delete operational documentation or state history unless explicitly requested.
-2. **Context First:** Always read `state.json` before proposing a change to ensure environment compatibility.
-3. **Agnostic Communication:** Use the `SGA` (Memory L0/L1) to communicate insights between different nodes and agents.
+## 🔄 6. BOOTSTRAPPING & RUNTIME FLOW
+1. **Trigger:** El usuario habla a Hermes (Telegram/CLI).
+2. **Boot:** Hermes lee el repo e identifica `jarvis.py` como punto de entrada.
+3. **Context Awareness:** Jarvis usa `env_drivers/` para saber *dónde* está y lee `state.json` para entender el estado global.
+4. **Self-Update:** Antes de cada ciclo, Jarvis hace un `git pull` para sincronizar cambios realizados por otros nodos o agentes.
 
 ---
+**¡SwarmTeam OS Elite v3.0 está en línea!**

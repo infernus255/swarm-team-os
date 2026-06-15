@@ -1,13 +1,28 @@
-# Registro de Memoria del Sistema y Aprendizajes
+# 🧠 SwarmTeam OS: SGA Memory Architecture (v3.0)
 
-## 📅 Últimas Actualizaciones (Junio 2026)
+La **SGA (Shared Global Alignment)** es la infraestructura de memoria distribuida que permite que todos los nodos de SwarmTeam OS operen con una consciencia compartida.
 
-- **Validación de API Keys**: En entornos Windows y Docker, para que pase la validación de API keys, es necesario crear `api_key_limits.json` en la raíz del repositorio con los límites correspondientes y declarar las claves en `hermes.env` con el prefijo 'alias:' (ej. `GEMINI_API_KEY=primary:CLAVE`). Además, si Hermes se ejecuta únicamente dentro de Docker, se debe construir la imagen y etiquetarla como `hermes-test:latest`.
+## 🏛️ Estructura de Capas (L0 / L1)
 
-- **Manejo de Prefijos en API Keys**: Se corrigió el error 'model provider failed' al limpiar las claves API de los prefijos de alias en el entrypoint del contenedor (`docker-entrypoint.sh`). Esto permite que la telemetría mantenga el alias para mapear los límites, mientras que Hermes recibe la clave limpia.
+### L0: Memoria de Contexto y Meta-Estado (Local/Relacional)
+- **Propósito:** Gestionar el "quién es quién" y el estado conversacional.
+- **Tabla:** `sga_l0_context`
+- **Campos Clave:** `node_id`, `project_id`, `phase`, `metadata`.
+- **Uso:** Jarvis utiliza esta capa para saber en qué hardware está corriendo y cuál es el historial inmediato con el usuario.
 
-- **Migración a Neon Cloud DB (SGA)**: Se migró la base de datos de persistencia a Neon.tech (PostgreSQL serverless). El nuevo inicializador `infra/db_init.py` habilita la extensión `vector` e implementa índices HNSW. El cliente `memory/sga_client.py` ahora implementa un pool de conexión persistente e inyecta embeddings Gemini con dimensión exacta de 768.
+### L1: Memoria de Conocimiento y Sabiduría (Vectorial/Global)
+- **Propósito:** Almacenar patrones de ingeniería, arquitecturas y lecciones aprendidas.
+- **Tabla:** `sga_l1_swarm_knowledge`
+- **Motor:** pgvector (PostgreSQL) + Gemini Embeddings (768d).
+- **Uso:** Los motores de Swarm consultan esta capa para evitar repetir errores pasados y aplicar las mejores prácticas (JIT Context).
 
-- **Bypass de PEP 668**: La instalación de paquetes sobre el contenedor basado en Ubuntu 24.04 arrojó errores de entorno administrado. Se resolvió usando el flag `--break-system-packages` de pip en el `Dockerfile`.
+## 🕵️ Integración Guru-Watch
+La capa L1 se alimenta automáticamente de fuentes externas de élite mediante el protocolo **Guru-Watch**, asegurando que el conocimiento del enjambre esté siempre a la vanguardia.
 
-- **Mapeo de Rutas y Persona**: Se reestructuró `docker-compose.yml` para montar la raíz completa en `/app`. Se implementó un perfil de sistema maestro `infra/hermes/SOUL.md` que inyecta la personalidad de Jarvis OS al agente Hermes.
+## 🛠️ Comandos de Mantenimiento
+- **Inicializar DB:** `python infra/db_init.py`
+- **Validar Conexión:** `python tests/test_sga_client.py`
+- **Sincronizar Gurus:** `python harness/scripts/skill_guru_watch.py`
+
+---
+*La memoria es el único activo que crece con cada ejecución.*

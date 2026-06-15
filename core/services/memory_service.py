@@ -86,6 +86,7 @@ class MemoryService:
             return False
 
     def query_memory(self, query: str, limit: int = 5) -> str:
+        """Queries for local project context (L0/L1)."""
         try:
             conn = self._get_connection()
             with conn.cursor() as cur:
@@ -105,6 +106,33 @@ class MemoryService:
                     """, (settings.env_tier, f"%{query}%", limit))
                 
                 rows = cur.fetchall()
-                return "\n\n".join([r[0] for row in rows]) if rows else "No memories found."
-        except Exception:
+                return "\n\n".join([r[0] for r in rows]) if rows else "No memories found."
+        except Exception as e:
+            print(f"[MemoryService] Query error: {e}", file=sys.stderr)
             return "Error querying memory."
+
+    def query_global_memory(self, query: str, limit: int = 10) -> str:
+        """Queries for global cross-project knowledge (L1)."""
+        try:
+            conn = self._get_connection()
+            with conn.cursor() as cur:
+                if not self._authenticate(cur):
+                    return "Auth failed"
+
+                embedding = self.embedding_provider.get_embedding(query)
+                if embedding:
+                    cur.execute("""
+                        SELECT content FROM sga_l1_swarm_knowledge 
+                        ORDER BY embedding <=> %s::vector LIMIT %s;
+                    """, (embedding, limit))
+                else:
+                    cur.execute("""
+                        SELECT content FROM sga_l1_swarm_knowledge 
+                        WHERE content ILIKE %s ORDER BY created_at DESC LIMIT %s;
+                    """, (f"%{query}%", limit))
+                
+                rows = cur.fetchall()
+                return "\n\n---\n\n".join([r[0] for r in rows]) if rows else "No global memory context available."
+        except Exception as e:
+            print(f"[MemoryService] Global query error: {e}", file=sys.stderr)
+            return "Error querying global memory."
