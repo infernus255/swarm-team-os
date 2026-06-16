@@ -38,6 +38,11 @@ class NodeService:
         deps = ["python3", "git", "docker", "pytest"]
         return {dep: self._check_bin(dep) for dep in deps}
 
+    def check_centralized_config(self) -> Dict[str, bool]:
+        """Verifica si las claves críticas están presentes en el entorno."""
+        keys = ["GEMINI_API_KEY", "DATABASE_URL"]
+        return {key: (os.getenv(key) is not None) for key in keys}
+
     def _is_container(self) -> bool:
         return os.path.exists('/.dockerenv') or os.path.exists('/run/.containerenv')
 

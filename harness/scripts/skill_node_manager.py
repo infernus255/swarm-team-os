@@ -35,10 +35,28 @@ def run_skill():
 
     elif args.action == "check":
         deps = service.check_runtime_dependencies()
+        configs = service.check_centralized_config()
+        
         print("\n🔍 [Dependency Audit]")
         for dep, status in deps.items():
             color = "✅" if status == "installed" else "❌"
             print(f"   {color} {dep:10} -> {status}")
+            
+        print("\n🔑 [Centralized Config Audit]")
+        all_ok = True
+        for key, present in configs.items():
+            color = "✅" if present else "❌"
+            status = "present" if present else "MISSING"
+            print(f"   {color} {key:15} -> {status}")
+            if not present: all_ok = False
+            
+        if not all_ok:
+            print("\n💡 [Action Required]:")
+            print("   Para centralizar tus claves y evitar este mensaje en todos tus entornos:")
+            print("   1. Ve a: GitHub Repository -> Settings -> Codespaces -> Secrets")
+            print("   2. Agrega las claves faltantes mencionadas arriba.")
+            print("   3. Reinicia tu Codespace.")
+        print("")
 
 if __name__ == "__main__":
     run_skill()
