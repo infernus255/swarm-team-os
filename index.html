@@ -99,8 +99,8 @@
             background: var(--glass-bg);
             border: 1px solid var(--glass-border);
             color: var(--text-color);
-            padding: 8px 12px;
-            border-radius: 8px;
+            padding: 10px 16px;
+            min-height: 44px;
             font-weight: bold;
             font-size: 13px;
             cursor: pointer;
@@ -301,6 +301,17 @@
             [BLOCKS.SAND]: { name: "Arena", solid: true, hardness: 0.5, color: "hsl(45, 60%, 75%)", sandPhysics: true },
             [BLOCKS.WATER]: { name: "Agua", solid: false, hardness: 0.1, color: "rgba(30, 100, 220, 0.6)", fluid: true },
             [BLOCKS.BEDROCK]: { name: "Roca Base", solid: true, hardness: Infinity, color: "hsl(0, 0%, 15%)" }
+        };
+
+        const SKY_COLORS = {
+            NIGHT_TOP: { r: 13, g: 14, b: 21 },
+            NIGHT_BOT: { r: 5, g: 5, b: 8 },
+            DAY_TOP: { r: 135, g: 206, b: 235 },
+            DAY_BOT: { r: 224, g: 246, b: 255 },
+            SUNRISE_TOP: { r: 26, g: 15, b: 35 },
+            SUNRISE_BOT: { r: 255, g: 140, b: 0 },
+            SUNSET_TOP: { r: 18, g: 16, b: 32 },
+            SUNSET_BOT: { r: 211, g: 84, b: 0 }
         };
 
         // ==========================================
@@ -575,7 +586,7 @@
                         ctx.fillRect(rand() * BLOCK_SIZE, rand() * BLOCK_SIZE, 2, 2);
                     }
                 } else if (id === BLOCKS.WATER) {
-                    // Keep transparent blue
+                    // Transparent blue wave pre-render
                     ctx.fillStyle = "rgba(30, 110, 230, 0.7)";
                     ctx.fillRect(0, 0, BLOCK_SIZE, BLOCK_SIZE);
                     ctx.strokeStyle = "rgba(255, 255, 255, 0.3)";
@@ -830,6 +841,7 @@
                 this.vy = 0;
                 this.ax = 0;
                 this.onGround = false;
+                this.inWater = false;
                 this.selectedBlock = BLOCKS.DIRT;
 
                 this.walkCycle = 0;
@@ -840,11 +852,38 @@
                 this.stepTimer = 0;
             }
 
-            update(dt, world) {
-                this.vy += GRAVITY * dt;
-                if (this.vy > MAX_FALL_SPEED) this.vy = MAX_FALL_SPEED;
+            isPlayerInWater(world) {
+                const startX = Math.floor(this.x / BLOCK_SIZE);
+                const endX = Math.floor((this.x + this.width) / BLOCK_SIZE);
+                const startY = Math.floor(this.y / BLOCK_SIZE);
+                const endY = Math.floor((this.y + this.height) / BLOCK_SIZE);
 
-                this.vx += this.ax * WALK_ACCEL * dt;
+                for (let y = startY; y <= endY; y++) {
+                    for (let x = startX; x <= endX; x++) {
+                        if (world.getBlock(x, y) === BLOCKS.WATER) {
+                            return true;
+                        }
+                    }
+                }
+                return false;
+            }
+
+            update(dt, world) {
+                const inWater = this.isPlayerInWater(world);
+                this.inWater = inWater;
+
+                // Physics modifiers inside fluids (buoyancy & water friction)
+                if (inWater) {
+                    this.vy += GRAVITY * 0.15 * dt;
+                    if (this.vy > 100) this.vy = 100;
+                    if (this.vy < -150) this.vy = -150;
+                } else {
+                    this.vy += GRAVITY * dt;
+                    if (this.vy > MAX_FALL_SPEED) this.vy = MAX_FALL_SPEED;
+                }
+
+                // Slower acceleration in water
+                this.vx += this.ax * WALK_ACCEL * (inWater ? 0.6 : 1.0) * dt;
                 this.vx *= Math.pow(FRICTION, dt * 60);
 
                 if (Math.abs(this.vx) > 10) {
@@ -890,6 +929,9 @@
                     this.vy = JUMP_FORCE;
                     this.onGround = false;
                     audio.playJump();
+                } else if (this.inWater) {
+                    this.vy = JUMP_FORCE * 0.35; // Swim stroke up
+                    audio.playStep();
                 }
             }
 
@@ -1067,6 +1109,7 @@
                 this.player = null;
                 this.camera = null;
                 this.particles = new ParticleSystem();
+                this.parallaxNoise = new Noise2D(90);
 
                 this.pointers = {};
                 this.joystick = {
@@ -1217,6 +1260,8 @@
 
             onPointerDown(e) {
                 e.preventDefault();
+                // Capture touch target focus to mitigate touch drift near screens boundary edges
+                e.target.setPointerCapture(e.pointerId);
                 this.pointers[e.pointerId] = { x: e.clientX, y: e.clientY };
 
                 if (e.clientX < window.innerWidth / 2) {
@@ -1264,6 +1309,9 @@
 
             onPointerUp(e) {
                 e.preventDefault();
+                try {
+                    e.target.releasePointerCapture(e.pointerId);
+                } catch (err) {}
                 delete this.pointers[e.pointerId];
 
                 if (this.joystick.active && this.joystick.pointerId === e.pointerId) {
@@ -1317,13 +1365,20 @@
                     ];
                     const hasSolidNeighbour = adjacents.some(b => b !== BLOCKS.AIR && BLOCK_INFO[b].solid);
 
-                    const blockRect = { x: gridX * BLOCK_SIZE, y: gridY * BLOCK_SIZE, w: BLOCK_SIZE, h: BLOCK_SIZE };
-                    const playerRect = { x: this.player.x, y: this.player.y, w: this.player.width, h: this.player.height };
+                    // Optimized AABB collision check without heap object allocations
+                    const blockLeft = gridX * BLOCK_SIZE;
+                    const blockRight = blockLeft + BLOCK_SIZE;
+                    const blockTop = gridY * BLOCK_SIZE;
+                    const blockBottom = blockTop + BLOCK_SIZE;
+                    const playerLeft = this.player.x;
+                    const playerRight = playerLeft + this.player.width;
+                    const playerTop = this.player.y;
+                    const playerBottom = playerTop + this.player.height;
                     const overlap = (
-                        playerRect.x < blockRect.x + blockRect.w &&
-                        playerRect.x + playerRect.w > blockRect.x &&
-                        playerRect.y < blockRect.y + blockRect.h &&
-                        playerRect.y + playerRect.h > blockRect.y
+                        playerLeft < blockRight &&
+                        playerRight > blockLeft &&
+                        playerTop < blockBottom &&
+                        playerBottom > playerTop
                     );
 
                     const placeInfo = BLOCK_INFO[this.player.selectedBlock];
@@ -1479,29 +1534,34 @@
                 document.getElementById("val-blocks").innerText = blocksRenderedCount;
             }
 
+            blendColors(c1, c2, ratio) {
+                const r = Math.round(c1.r + (c2.r - c1.r) * ratio);
+                const g = Math.round(c1.g + (c2.g - c1.g) * ratio);
+                const b = Math.round(c1.b + (c2.b - c1.b) * ratio);
+                return `rgb(${r}, ${g}, ${b})`;
+            }
+
             drawSky(ctx, width, height) {
                 let gradient = ctx.createLinearGradient(0, 0, 0, height);
                 let skyAngle = (this.skyTime / 24000) * Math.PI * 2;
 
-                let sunColor = "#ffd700";
-                let skyTop = "#87ceeb";
-                let skyBot = "#e0f6ff";
+                let skyTop, skyBot;
 
                 if (this.skyTime >= 0 && this.skyTime < 4000) {
                     const ratio = this.skyTime / 4000;
-                    skyTop = this.blendColors("#0d0e15", "#87ceeb", ratio);
-                    skyBot = this.blendColors("#160c1d", "#ffaa44", ratio);
+                    skyTop = this.blendColors(SKY_COLORS.NIGHT_TOP, SKY_COLORS.DAY_TOP, ratio);
+                    skyBot = this.blendColors(SKY_COLORS.NIGHT_BOT, SKY_COLORS.SUNRISE_BOT, ratio);
                 } else if (this.skyTime >= 4000 && this.skyTime < 12000) {
-                    skyTop = "#87ceeb";
-                    skyBot = "#e0f6ff";
+                    skyTop = `rgb(${SKY_COLORS.DAY_TOP.r}, ${SKY_COLORS.DAY_TOP.g}, ${SKY_COLORS.DAY_TOP.b})`;
+                    skyBot = `rgb(${SKY_COLORS.DAY_BOT.r}, ${SKY_COLORS.DAY_BOT.g}, ${SKY_COLORS.DAY_BOT.b})`;
                 } else if (this.skyTime >= 12000 && this.skyTime < 16000) {
                     const ratio = (this.skyTime - 12000) / 4000;
-                    skyTop = this.blendColors("#87ceeb", "#121020", ratio);
-                    skyBot = this.blendColors("#e0f6ff", "#d35400", ratio);
+                    skyTop = this.blendColors(SKY_COLORS.DAY_TOP, SKY_COLORS.SUNSET_TOP, ratio);
+                    skyBot = this.blendColors(SKY_COLORS.DAY_BOT, SKY_COLORS.SUNSET_BOT, ratio);
                 } else {
                     const ratio = (this.skyTime - 16000) / 8000;
-                    skyTop = this.blendColors("#121020", "#0c0d14", ratio);
-                    skyBot = this.blendColors("#d35400", "#050508", ratio);
+                    skyTop = this.blendColors(SKY_COLORS.SUNSET_TOP, SKY_COLORS.NIGHT_TOP, ratio);
+                    skyBot = this.blendColors(SKY_COLORS.SUNSET_BOT, SKY_COLORS.NIGHT_BOT, ratio);
                 }
 
                 gradient.addColorStop(0, skyTop);
@@ -1563,9 +1623,8 @@
                 ctx.fillStyle = "rgba(42, 45, 68, 0.4)";
                 ctx.beginPath();
                 ctx.moveTo(0, height);
-                const noise = new Noise2D(90);
                 for (let x = 0; x <= width; x += 16) {
-                    const my = height * 0.75 + noise.noise((x + this.camera.x * 0.1) * 0.003, 0) * 120;
+                    const my = height * 0.75 + this.parallaxNoise.noise((x + this.camera.x * 0.1) * 0.003, 0) * 120;
                     ctx.lineTo(x, my);
                 }
                 ctx.lineTo(width, height);
@@ -1575,29 +1634,11 @@
                 ctx.beginPath();
                 ctx.moveTo(0, height);
                 for (let x = 0; x <= width; x += 16) {
-                    const my = height * 0.8 + noise.noise((x + this.camera.x * 0.25) * 0.005, 50) * 70;
+                    const my = height * 0.8 + this.parallaxNoise.noise((x + this.camera.x * 0.25) * 0.005, 50) * 70;
                     ctx.lineTo(x, my);
                 }
                 ctx.lineTo(width, height);
                 ctx.fill();
-            }
-
-            blendColors(color1, color2, ratio) {
-                const c1 = this.hexToRgb(color1);
-                const c2 = this.hexToRgb(color2);
-                const r = Math.round(c1.r + (c2.r - c1.r) * ratio);
-                const g = Math.round(c1.g + (c2.g - c1.g) * ratio);
-                const b = Math.round(c1.b + (c2.b - c1.b) * ratio);
-                return `rgb(${r}, ${g}, ${b})`;
-            }
-
-            hexToRgb(hex) {
-                const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-                return result ? {
-                    r: parseInt(result[1], 16),
-                    g: parseInt(result[2], 16),
-                    b: parseInt(result[3], 16)
-                } : { r: 15, g: 15, b: 20 };
             }
 
             drawJoystick(ctx) {
