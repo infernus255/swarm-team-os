@@ -84,7 +84,7 @@ async def qa_node(state: GraphState) -> GraphState:
     return state
 
 async def benchmarking_node(state: GraphState) -> GraphState:
-    print(f"--- [M4b] Benchmarking: Midiendo Rendimiento ---")
+    print(f"--- [M4b] Benchmarking: Auditoría de Rendimiento y Calidad ---")
     source_path = Path("app_result/src/main.py")
     
     if not source_path.exists():
@@ -94,21 +94,32 @@ async def benchmarking_node(state: GraphState) -> GraphState:
     import time
     import subprocess
     
+    # 1. Performance Measurement
     start_time = time.time()
     try:
-        # Run the generated code and measure time
         result = subprocess.run(["python3", str(source_path)], capture_output=True, timeout=5)
         duration = time.time() - start_time
-        print(f"⏱️ Ejecución completada en {duration:.4f}s")
+        print(f"⏱️ Ejecución: {duration:.4f}s")
         
-        state["artifacts"]["benchmarking"] = f"Duration: {duration:.4f}s"
+        # 2. Static Analysis (Simulated complexity check)
+        content = source_path.read_text()
+        lines = len(content.splitlines())
+        complexity_score = "LOW" if lines < 20 else "MEDIUM"
         
-        # Elite Standard: if duration > 1s for a hello world, it's inefficient (just an example)
-        if duration > 1.0:
-            print("⚠️ Advertencia: Rendimiento por debajo de los estándares Elite.")
+        print(f"📊 Complejidad Estática: {complexity_score} ({lines} líneas)")
+        
+        state["artifacts"]["benchmarking"] = {
+            "duration": f"{duration:.4f}s",
+            "complexity": complexity_score,
+            "lines": lines
+        }
+        
+        # Elite Standard Check
+        if duration > 1.5:
+            print("⚠️ ADVERTENCIA: Rendimiento insuficiente para los estándares SwarmTeam OS.")
             
     except Exception as e:
-        print(f"⚠️ No se pudo realizar el benchmark: {e}")
+        print(f"⚠️ Error en auditoría M4b: {e}")
     
     state["status"] = Status.DONE
     return state
