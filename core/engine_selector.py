@@ -24,8 +24,10 @@ class EngineSelector:
         engine_name = classification.get("selected_engine")
         reason = classification.get("reason", "No reason provided.")
         complexity = classification.get("complexity", "medium")
+        tech_stack = classification.get("detected_tech_stack", [])
         
         print(f"🎯 [Engine Selector]: Selected {engine_name} (Complexity: {complexity})")
+        print(f"🛠️ [Engine Selector]: Tech Stack: {', '.join(tech_stack) if tech_stack else 'Not detected'}")
         print(f"📝 [Engine Selector]: Reason: {reason}")
 
         # Validation: check if the folder exists

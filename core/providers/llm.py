@@ -33,41 +33,58 @@ class LLMProvider:
             return f"ERROR calling LLM: {str(e)}"
 
     async def classify_task(self, prompt: str) -> Dict[str, Any]:
-        """Classifies a task to select the optimal engine."""
+        """Classifies a task to select the optimal engine with high precision."""
         system_prompt = """
-        Eres el Clasificador Inteligente de SwarmTeam OS. 
-        Tu tarea es analizar el requerimiento del usuario y determinar qué 'engine' de swarm es el más adecuado.
+        Eres el Clasificador Inteligente de SwarmTeam OS Elite v3.1. 
+        Tu tarea es realizar una auditoría técnica del requerimiento del usuario para delegarlo al motor (engine) más eficiente.
         
-        Engines disponibles:
-        1. '.swarm_antigravity_sdk': Para tareas que involucren el SDK de Google Antigravity, orquestación compleja de agentes de Google, o si se menciona explícitamente 'antigravity'.
-        2. '.swarm_pydantic_fast': Para aplicaciones web (FastAPI), validación de datos (Pydantic), o si se busca una estructura de tipos rigurosa con PydanticAI.
-        3. '.swarm_copilot': Para generar instrucciones de VS Code Copilot, archivos .github/copilot-instructions.md o prompts para IDEs.
-        4. '.swarm_template': Solo si es un requerimiento muy genérico que no encaja en los anteriores.
+        CATÁLOGO DE ENGINES:
+        1. '.swarm_antigravity_sdk': 
+           - Casos de uso: Orquestación multi-agente, uso del SDK de Google Antigravity, lógica de grafos de agentes compleja.
+           - Palabras clave: agents, swarm orchestration, autonomy, antigravity.
+        2. '.swarm_pydantic_fast': 
+           - Casos de uso: APIs backend, validación de esquemas Pydantic, PydanticAI, microservicios rápidos.
+           - Palabras clave: fastapi, pydantic, schema, web service, rest api.
+        3. '.swarm_copilot': 
+           - Casos de uso: Configuración de entornos de desarrollo, instrucciones para VS Code, estandarización de prompts de IDE.
+           - Palabras clave: copilot, .github, instructions, developer experience.
+        4. '.swarm_template': 
+           - Casos de uso: Solo para prototipos genéricos o investigación inicial de archivos.
 
-        Responde ÚNICAMENTE en formato JSON con la siguiente estructura:
+        REGLAS DE SALIDA:
+        - Debes responder EXCLUSIVAMENTE con un objeto JSON válido.
+        - No incluyas explicaciones fuera del JSON.
+        - Si el requerimiento es ambiguo, selecciona '.swarm_antigravity_sdk' como predeterminado.
+
+        FORMATO JSON REQUERIDO:
         {
           "selected_engine": ".folder_name",
-          "reason": "breve explicación de la elección",
-          "complexity": "low|medium|high"
+          "reason": "Explicación técnica de la arquitectura seleccionada",
+          "complexity": "low|medium|high",
+          "detected_tech_stack": ["lista", "de", "tecnologías", "detectadas"]
         }
         """
         
         result = await self.generate_text(prompt, system_instruction=system_prompt)
         
         try:
-            # Clean possible markdown junk
+            # Clean possible markdown junk or additional text
             json_str = result.strip()
-            if json_str.startswith("```json"):
-                json_str = json_str[7:-3].strip()
-            elif json_str.startswith("```"):
-                json_str = json_str[3:-3].strip()
+            if "{" in json_str and "}" in json_str:
+                json_str = json_str[json_str.find("{"):json_str.rfind("}")+1]
             
-            return json.loads(json_str)
-        except Exception:
+            data = json.loads(json_str)
+            # Ensure mandatory fields
+            if "selected_engine" not in data:
+                raise ValueError("Missing 'selected_engine' in LLM response")
+            return data
+        except Exception as e:
+            print(f"⚠️ [LLMProvider]: Classification parsing failed: {e}. Raw output: {result}")
             return {
                 "selected_engine": ".swarm_antigravity_sdk",
-                "reason": f"Fallback due to classification error. Raw output: {result}",
-                "complexity": "medium"
+                "reason": "Fallback: Error parsing LLM classification response.",
+                "complexity": "medium",
+                "detected_tech_stack": []
             }
 
 llm_provider = LLMProvider()
