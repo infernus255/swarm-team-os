@@ -3,29 +3,57 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Swarm Jump AAA - Elite v3.1</title>
+    <title>Swarm Jump EXTREME - Triple AAA</title>
     <style>
-        body { margin: 0; overflow: hidden; background: radial-gradient(circle at center, #1a1a2e 0%, #0a0a0a 100%); font-family: 'Segoe UI', sans-serif; }
-        canvas { display: block; touch-action: none; filter: drop-shadow(0 0 10px rgba(0,255,204,0.3)); }
-        #ui { position: absolute; top: 30px; width: 100%; text-align: center; color: #00ffcc; font-size: 32px; font-weight: bold; pointer-events: none; letter-spacing: 2px; text-shadow: 0 0 15px #00ffcc; }
+        body { margin: 0; overflow: hidden; background: #0f0c29; background: linear-gradient(to bottom, #24243e, #302b63, #0f0c29); font-family: 'Arial Black', Gadget, sans-serif; }
+        canvas { display: block; touch-action: none; }
+        #ui { 
+            position: absolute; top: 20px; width: 100%; display: flex; justify-content: space-around;
+            color: white; font-size: 28px; pointer-events: none; text-shadow: 3px 3px 0px #000;
+        }
+        .stat { background: rgba(0,0,0,0.5); padding: 5px 20px; border-radius: 50px; border: 3px solid #00ffcc; }
+        #fever-bar {
+            position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
+            width: 80%; height: 20px; background: rgba(255,255,255,0.2); border-radius: 10px; overflow: hidden;
+            border: 2px solid white; display: none;
+        }
+        #fever-fill { width: 0%; height: 100%; background: linear-gradient(90deg, #ff00cc, #3333ff); transition: width 0.1s; }
+        #message {
+            position: absolute; top: 50%; width: 100%; text-align: center;
+            color: #ff00cc; font-size: 60px; font-weight: bold; display: none;
+            text-shadow: 0 0 20px #fff; transform: translateY(-50%) scale(0.5);
+        }
     </style>
 </head>
 <body>
-    <div id="ui">BITS: <span id="score">1</span></div>
+    <div id="ui">
+        <div class="stat">BITS: <span id="score">1</span></div>
+        <div class="stat">🪙 <span id="coins">0</span></div>
+    </div>
+    <div id="fever-bar"><div id="fever-fill"></div></div>
+    <div id="message">FEVER MODE!</div>
     <canvas id="gameCanvas"></canvas>
 
     <script>
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
         const scoreEl = document.getElementById('score');
+        const coinsEl = document.getElementById('coins');
+        const feverBar = document.getElementById('fever-bar');
+        const feverFill = document.getElementById('fever-fill');
+        const msgEl = document.getElementById('message');
 
         let width, height;
         let swarm = [];
         let playerX = 0;
         let targetX = 0;
-        let speed = 7;
+        let speed = 8;
         let distance = 0;
         let gates = [];
+        let coins = 0;
+        let particles = [];
+        let isFever = false;
+        let feverAmount = 0;
 
         function init() {
             width = canvas.width = window.innerWidth;
@@ -40,30 +68,68 @@
             swarm = [];
             for (let i = 0; i < size; i++) {
                 swarm.push({
-                    offX: (Math.random() - 0.5) * 60,
-                    offY: (Math.random() - 0.5) * 60,
-                    hue: 160 + Math.random() * 40
+                    offX: (Math.random() - 0.5) * 80,
+                    offY: (Math.random() - 0.5) * 80,
+                    hue: isFever ? Math.random() * 360 : 180 + Math.random() * 40,
+                    size: 6 + Math.random() * 4
                 });
             }
             scoreEl.innerText = swarm.length;
+            
+            // Check Fever Mode
+            if (swarm.length >= 100 && !isFever) activateFever();
+        }
+
+        function activateFever() {
+            isFever = true;
+            feverBar.style.display = 'block';
+            feverAmount = 100;
+            speed = 15;
+            msgEl.style.display = 'block';
+            msgEl.style.animation = 'feverAnim 0.5s infinite alternate';
+            setTimeout(() => { msgEl.style.display = 'none'; }, 2000);
         }
 
         function spawnGate() {
-            const isBlue = Math.random() > 0.4;
+            const isBlue = Math.random() > 0.3;
+            const gateWidth = 180;
             gates.push({
-                x: Math.random() * (width - 180),
+                x: Math.random() * (width - gateWidth),
                 y: -150,
-                w: 180,
+                w: gateWidth,
                 h: 80,
                 type: isBlue ? 'MUL' : 'SUB',
-                value: isBlue ? (Math.random() > 0.8 ? 5 : 2) : 10,
-                color: isBlue ? '#00ccff' : '#ff4444'
+                value: isBlue ? (Math.random() > 0.7 ? 5 : 2) : (isFever ? 0 : 10),
+                color: isBlue ? '#00f2ff' : '#ff0055',
+                hasCoin: Math.random() > 0.5
             });
+        }
+
+        function spawnExplosion(x, y, color) {
+            for (let i = 0; i < 20; i++) {
+                particles.push({
+                    x, y,
+                    vx: (Math.random() - 0.5) * 15,
+                    vy: (Math.random() - 0.5) * 15,
+                    life: 1.0,
+                    color
+                });
+            }
         }
 
         function update() {
             distance += speed;
-            playerX += (targetX - playerX) * 0.15;
+            playerX += (targetX - playerX) * 0.2;
+
+            if (isFever) {
+                feverAmount -= 0.5;
+                feverFill.style.width = feverAmount + '%';
+                if (feverAmount <= 0) {
+                    isFever = false;
+                    feverBar.style.display = 'none';
+                    speed = 8;
+                }
+            }
 
             for (let i = gates.length - 1; i >= 0; i--) {
                 const g = gates[i];
@@ -72,6 +138,11 @@
                 if (g.y > height - 160 && g.y < height - 80) {
                     if (playerX > g.x && playerX < g.x + g.w) {
                         applyGate(g);
+                        spawnExplosion(playerX, height - 120, g.color);
+                        if (g.hasCoin) {
+                            coins += 10;
+                            coinsEl.innerText = coins;
+                        }
                         gates.splice(i, 1);
                         continue;
                     }
@@ -79,7 +150,15 @@
                 if (g.y > height) gates.splice(i, 1);
             }
 
-            if (distance % 180 === 0) spawnGate();
+            // Particles update
+            for (let i = particles.length - 1; i >= 0; i--) {
+                const p = particles[i];
+                p.x += p.vx; p.y += p.vy;
+                p.life -= 0.02;
+                if (p.life <= 0) particles.splice(i, 1);
+            }
+
+            if (distance % 150 === 0) spawnGate();
 
             draw();
             requestAnimationFrame(update);
@@ -89,54 +168,66 @@
             let newSize = swarm.length;
             if (gate.type === 'MUL') newSize *= gate.value;
             else newSize = Math.max(1, newSize - gate.value);
-            
-            if (newSize > 1000) newSize = 1000; // Limit for performance
             resetSwarm(newSize);
         }
 
         function draw() {
-            // Motion Blur Effect
-            ctx.fillStyle = 'rgba(10, 10, 10, 0.3)';
+            // Neon Background
+            ctx.fillStyle = 'rgba(15, 12, 41, 0.4)';
             ctx.fillRect(0, 0, width, height);
 
-            // Draw Gates with Neon Style
+            // Draw Particles
+            particles.forEach(p => {
+                ctx.globalAlpha = p.life;
+                ctx.fillStyle = p.color;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, 5, 0, Math.PI * 2);
+                ctx.fill();
+            });
+            ctx.globalAlpha = 1.0;
+
+            // Draw Gates
             gates.forEach(g => {
                 ctx.save();
-                ctx.shadowBlur = 20;
+                ctx.shadowBlur = 25;
                 ctx.shadowColor = g.color;
                 
                 const grad = ctx.createLinearGradient(g.x, g.y, g.x, g.y + g.h);
                 grad.addColorStop(0, g.color);
-                grad.addColorStop(1, 'rgba(0,0,0,0.5)');
+                grad.addColorStop(1, '#000');
                 
                 ctx.fillStyle = grad;
                 ctx.fillRect(g.x, g.y, g.w, g.h);
                 
                 ctx.strokeStyle = '#fff';
-                ctx.lineWidth = 2;
+                ctx.lineWidth = 4;
                 ctx.strokeRect(g.x, g.y, g.w, g.h);
+
+                if (g.hasCoin) {
+                    ctx.fillStyle = '#ffd700';
+                    ctx.beginPath();
+                    ctx.arc(g.x + g.w - 20, g.y + 20, 10, 0, Math.PI * 2);
+                    ctx.fill();
+                }
                 
-                ctx.shadowBlur = 0;
                 ctx.fillStyle = '#fff';
-                ctx.font = 'bold 28px Arial';
+                ctx.font = 'bold 36px Arial';
                 ctx.textAlign = 'center';
-                ctx.fillText(gateText(g), g.x + g.w/2, g.y + 50);
+                ctx.fillText(g.type === 'MUL' ? `×${g.value}` : `−${g.value}`, g.x + g.w/2, g.y + 55);
                 ctx.restore();
             });
 
             // Draw Swarm
             swarm.forEach(b => {
+                ctx.save();
+                ctx.shadowBlur = isFever ? 20 : 10;
+                ctx.shadowColor = `hsl(${b.hue}, 100%, 70%)`;
                 ctx.fillStyle = `hsl(${b.hue}, 100%, 60%)`;
-                ctx.shadowBlur = 10;
-                ctx.shadowColor = ctx.fillStyle;
                 ctx.beginPath();
-                ctx.arc(playerX + b.offX, height - 120 + b.offY, 5, 0, Math.PI * 2);
+                ctx.arc(playerX + b.offX, height - 120 + b.offY, b.size, 0, Math.PI * 2);
                 ctx.fill();
+                ctx.restore();
             });
-        }
-
-        function gateText(g) {
-            return g.type === 'MUL' ? `×${g.value}` : `−${g.value}`;
         }
 
         canvas.addEventListener('mousemove', e => targetX = e.clientX);
@@ -149,5 +240,11 @@
         init();
         update();
     </script>
+    <style>
+        @keyframes feverAnim {
+            from { transform: translateY(-50%) scale(0.8); opacity: 0.7; }
+            to { transform: translateY(-50%) scale(1.2); opacity: 1; }
+        }
+    </style>
 </body>
 </html>
