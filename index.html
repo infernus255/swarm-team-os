@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Swarm Jump AAA - Elite v3.1</title>
+    <style>
+        body { margin: 0; overflow: hidden; background: radial-gradient(circle at center, #1a1a2e 0%, #0a0a0a 100%); font-family: 'Segoe UI', sans-serif; }
+        canvas { display: block; touch-action: none; filter: drop-shadow(0 0 10px rgba(0,255,204,0.3)); }
+        #ui { position: absolute; top: 30px; width: 100%; text-align: center; color: #00ffcc; font-size: 32px; font-weight: bold; pointer-events: none; letter-spacing: 2px; text-shadow: 0 0 15px #00ffcc; }
+    </style>
+</head>
+<body>
+    <div id="ui">BITS: <span id="score">1</span></div>
+    <canvas id="gameCanvas"></canvas>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const scoreEl = document.getElementById('score');
+
+        let width, height;
+        let swarm = [];
+        let playerX = 0;
+        let targetX = 0;
+        let speed = 7;
+        let distance = 0;
+        let gates = [];
+
+        function init() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+            playerX = width / 2;
+            targetX = playerX;
+            resetSwarm(1);
+            spawnGate();
+        }
+
+        function resetSwarm(size) {
+            swarm = [];
+            for (let i = 0; i < size; i++) {
+                swarm.push({
+                    offX: (Math.random() - 0.5) * 60,
+                    offY: (Math.random() - 0.5) * 60,
+                    hue: 160 + Math.random() * 40
+                });
+            }
+            scoreEl.innerText = swarm.length;
+        }
+
+        function spawnGate() {
+            const isBlue = Math.random() > 0.4;
+            gates.push({
+                x: Math.random() * (width - 180),
+                y: -150,
+                w: 180,
+                h: 80,
+                type: isBlue ? 'MUL' : 'SUB',
+                value: isBlue ? (Math.random() > 0.8 ? 5 : 2) : 10,
+                color: isBlue ? '#00ccff' : '#ff4444'
+            });
+        }
+
+        function update() {
+            distance += speed;
+            playerX += (targetX - playerX) * 0.15;
+
+            for (let i = gates.length - 1; i >= 0; i--) {
+                const g = gates[i];
+                g.y += speed;
+
+                if (g.y > height - 160 && g.y < height - 80) {
+                    if (playerX > g.x && playerX < g.x + g.w) {
+                        applyGate(g);
+                        gates.splice(i, 1);
+                        continue;
+                    }
+                }
+                if (g.y > height) gates.splice(i, 1);
+            }
+
+            if (distance % 180 === 0) spawnGate();
+
+            draw();
+            requestAnimationFrame(update);
+        }
+
+        function applyGate(gate) {
+            let newSize = swarm.length;
+            if (gate.type === 'MUL') newSize *= gate.value;
+            else newSize = Math.max(1, newSize - gate.value);
+            
+            if (newSize > 1000) newSize = 1000; // Limit for performance
+            resetSwarm(newSize);
+        }
+
+        function draw() {
+            // Motion Blur Effect
+            ctx.fillStyle = 'rgba(10, 10, 10, 0.3)';
+            ctx.fillRect(0, 0, width, height);
+
+            // Draw Gates with Neon Style
+            gates.forEach(g => {
+                ctx.save();
+                ctx.shadowBlur = 20;
+                ctx.shadowColor = g.color;
+                
+                const grad = ctx.createLinearGradient(g.x, g.y, g.x, g.y + g.h);
+                grad.addColorStop(0, g.color);
+                grad.addColorStop(1, 'rgba(0,0,0,0.5)');
+                
+                ctx.fillStyle = grad;
+                ctx.fillRect(g.x, g.y, g.w, g.h);
+                
+                ctx.strokeStyle = '#fff';
+                ctx.lineWidth = 2;
+                ctx.strokeRect(g.x, g.y, g.w, g.h);
+                
+                ctx.shadowBlur = 0;
+                ctx.fillStyle = '#fff';
+                ctx.font = 'bold 28px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText(gateText(g), g.x + g.w/2, g.y + 50);
+                ctx.restore();
+            });
+
+            // Draw Swarm
+            swarm.forEach(b => {
+                ctx.fillStyle = `hsl(${b.hue}, 100%, 60%)`;
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = ctx.fillStyle;
+                ctx.beginPath();
+                ctx.arc(playerX + b.offX, height - 120 + b.offY, 5, 0, Math.PI * 2);
+                ctx.fill();
+            });
+        }
+
+        function gateText(g) {
+            return g.type === 'MUL' ? `×${g.value}` : `−${g.value}`;
+        }
+
+        canvas.addEventListener('mousemove', e => targetX = e.clientX);
+        canvas.addEventListener('touchmove', e => {
+            targetX = e.touches[0].clientX;
+            e.preventDefault();
+        }, { passive: false });
+
+        window.addEventListener('resize', init);
+        init();
+        update();
+    </script>
+</body>
+</html>
