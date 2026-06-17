@@ -24,7 +24,6 @@ VALIDATION_FILES = [
     "README.md",
     "docs/HERMES_TELEGRAM_INSTALL_PLAN.md",
     "docs/copilot-instructions.md",
-    "docs/PES_FORGE_2D.md",
     "harness/README.md",
     "harness/docs/COPILOT_SKILL.md",
     "docs/N8N.md",
@@ -33,6 +32,17 @@ VALIDATION_FILES = [
     "infra/hermes/docker-entrypoint.sh",
     "infra/hermes/hermes-install.sh",
 ]
+
+
+def find_pes_file():
+    docs_dir = REPO_ROOT / "docs"
+    if docs_dir.exists() and docs_dir.is_dir():
+        for file in docs_dir.glob("PES_*.md"):
+            return file
+        pes_standard = docs_dir / "PES.md"
+        if pes_standard.exists():
+            return pes_standard
+    return None
 
 
 def run(cmd, check=True, capture_output=True):
@@ -198,6 +208,19 @@ def main():
             ok, msg = validate_file(path)
             if not ok:
                 errors.append(msg)
+
+        # Dynamic PES spec validation
+        pes_file = find_pes_file()
+        if pes_file:
+            try:
+                rel_path = pes_file.relative_to(REPO_ROOT)
+                ok, msg = validate_file(str(rel_path).replace("\\", "/"))
+                if not ok:
+                    errors.append(msg)
+            except ValueError:
+                errors.append(f"El archivo PES {pes_file} no está dentro del directorio raíz del repositorio")
+        else:
+            errors.append("Falta el archivo de Especificación de Producto e Ingeniería (docs/PES_*.md o docs/PES.md)")
 
         print("Validando estado del sistema operativo...")
         ok, msg = validate_os(state)
