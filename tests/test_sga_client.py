@@ -19,7 +19,7 @@ def test_sga_push_and_query():
 
     print("[TEST] Testing SGA query_global_memory...")
     # Query memory
-    query_text = "Neon DB integration and HNSW similarity"
+    query_text = "Neon DB integration"
     results = sga_client.query_global_memory(query=query_text, limit=1)
     
     assert results != "No global memory context available.", "SGA query returned no context"
