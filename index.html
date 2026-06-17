@@ -938,8 +938,9 @@
             resolveCollisionsX(world) {
                 const startX = Math.floor(this.x / BLOCK_SIZE);
                 const endX = Math.floor((this.x + this.width) / BLOCK_SIZE);
-                const startY = Math.floor(this.y / BLOCK_SIZE);
-                const endY = Math.floor((this.y + this.height) / BLOCK_SIZE);
+                // Apply a small Y-inset to avoid colliding with the ground underneath our feet
+                const startY = Math.floor((this.y + 4) / BLOCK_SIZE);
+                const endY = Math.floor((this.y + this.height - 4) / BLOCK_SIZE);
 
                 for (let y = startY; y <= endY; y++) {
                     for (let x = startX; x <= endX; x++) {
@@ -957,8 +958,9 @@
             }
 
             resolveCollisionsY(world) {
-                const startX = Math.floor(this.x / BLOCK_SIZE);
-                const endX = Math.floor((this.x + this.width) / BLOCK_SIZE);
+                // Apply a small X-inset to avoid catching on vertical wall seams when sliding
+                const startX = Math.floor((this.x + 4) / BLOCK_SIZE);
+                const endX = Math.floor((this.x + this.width - 4) / BLOCK_SIZE);
                 const startY = Math.floor(this.y / BLOCK_SIZE);
                 const endY = Math.floor((this.y + this.height) / BLOCK_SIZE);
 

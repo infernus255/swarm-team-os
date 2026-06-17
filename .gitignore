@@ -32,3 +32,4 @@ app_result/
 
 # Logs
 *.log
+.vercel
