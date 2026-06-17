@@ -11,7 +11,12 @@ class TestCellularAutomataPhysics(unittest.TestCase):
     """Validates the cellular automata physics engine constants and rules extracted from index.html."""
 
     def get_content(self):
-        return INDEX_HTML_PATH.read_text(encoding="utf-8")
+        content = INDEX_HTML_PATH.read_text(encoding="utf-8")
+        js_dir = REPO_ROOT / "js"
+        if js_dir.exists():
+            for js_file in sorted(js_dir.glob("*.js")):
+                content += "\n" + js_file.read_text(encoding="utf-8")
+        return content
 
     def get_constants(self):
         content = self.get_content()
@@ -191,24 +196,32 @@ class TestCellularAutomataPhysics(unittest.TestCase):
 class TestGameStructure(unittest.TestCase):
     """Validates the overall game structure and HTML/JS architecture."""
 
+    def get_content(self):
+        content = INDEX_HTML_PATH.read_text(encoding="utf-8")
+        js_dir = REPO_ROOT / "js"
+        if js_dir.exists():
+            for js_file in sorted(js_dir.glob("*.js")):
+                content += "\n" + js_file.read_text(encoding="utf-8")
+        return content
+
     def test_index_html_exists(self):
         self.assertTrue(INDEX_HTML_PATH.exists(), "index.html must exist")
 
     def test_html_structure(self):
-        content = INDEX_HTML_PATH.read_text(encoding="utf-8")
+        content = self.get_content()
         self.assertIn("<!DOCTYPE html>", content, "Must have HTML5 doctype")
         self.assertIn('<canvas id="gameCanvas"', content, "Must have game canvas element")
         self.assertIn("requestAnimationFrame", content, "Must use requestAnimationFrame game loop")
 
     def test_touch_controls(self):
-        content = INDEX_HTML_PATH.read_text(encoding="utf-8")
+        content = self.get_content()
         self.assertIn("pointerdown", content, "Must handle pointerdown events")
         self.assertIn("pointermove", content, "Must handle pointermove events")
         self.assertIn("pointerup", content, "Must handle pointerup events")
         self.assertIn("joystick", content, "Must have virtual joystick for mobile")
 
     def test_multiplayer_infrastructure(self):
-        content = INDEX_HTML_PATH.read_text(encoding="utf-8")
+        content = self.get_content()
         self.assertIn("RTCPeerConnection", content, "Must have WebRTC peer connection")
         self.assertIn("DataChannel", content, "Must have WebRTC data channel")
         self.assertIn("createOffer", content, "Must support creating offers")
@@ -228,7 +241,7 @@ class TestGameStructure(unittest.TestCase):
         self.assertIn("v-draw", content, "Must display draw time")
 
     def test_world_dimensions_reasonable(self):
-        content = INDEX_HTML_PATH.read_text(encoding="utf-8")
+        content = self.get_content()
         w_match = re.search(r"const\s+WORLD_W\s*=\s*(\d+)", content)
         h_match = re.search(r"const\s+WORLD_H\s*=\s*(\d+)", content)
         self.assertIsNotNone(w_match, "WORLD_W must be defined")
@@ -240,7 +253,7 @@ class TestGameStructure(unittest.TestCase):
 
     def test_typed_arrays_used(self):
         """Engine must use TypedArrays for performance."""
-        content = INDEX_HTML_PATH.read_text(encoding="utf-8")
+        content = self.get_content()
         self.assertIn("Uint8Array", content, "Must use Uint8Array for grid data")
         self.assertIn("Uint32Array", content, "Must use Uint32Array for color data")
 
