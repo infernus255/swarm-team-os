@@ -24,10 +24,15 @@ class Multiplayer {
         this.pc.onicecandidate = () => {};
         const offer = await this.pc.createOffer();
         await this.pc.setLocalDescription(offer);
-        // Wait for ICE gathering
+        // Wait for ICE gathering with 800ms timeout fallback for offline/restricted environments
         await new Promise(r => {
-            if (this.pc.iceGatheringState === 'complete') r();
-            else this.pc.onicegatheringstatechange = () => { if (this.pc.iceGatheringState === 'complete') r(); };
+            let done = false;
+            const finish = () => { if (!done) { done = true; r(); } };
+            if (this.pc.iceGatheringState === 'complete') finish();
+            else {
+                this.pc.onicegatheringstatechange = () => { if (this.pc.iceGatheringState === 'complete') finish(); };
+            }
+            setTimeout(finish, 800);
         });
         const code = btoa(JSON.stringify(this.pc.localDescription));
         const ta = document.getElementById('mp-code');
@@ -45,9 +50,15 @@ class Multiplayer {
         await this.pc.setRemoteDescription(offer);
         const answer = await this.pc.createAnswer();
         await this.pc.setLocalDescription(answer);
+        // Wait for ICE gathering with 800ms timeout fallback for offline/restricted environments
         await new Promise(r => {
-            if (this.pc.iceGatheringState === 'complete') r();
-            else this.pc.onicegatheringstatechange = () => { if (this.pc.iceGatheringState === 'complete') r(); };
+            let done = false;
+            const finish = () => { if (!done) { done = true; r(); } };
+            if (this.pc.iceGatheringState === 'complete') finish();
+            else {
+                this.pc.onicegatheringstatechange = () => { if (this.pc.iceGatheringState === 'complete') finish(); };
+            }
+            setTimeout(finish, 800);
         });
         const code = btoa(JSON.stringify(this.pc.localDescription));
         const ta = document.getElementById('mp-code');
