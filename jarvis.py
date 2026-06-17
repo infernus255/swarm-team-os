@@ -23,9 +23,9 @@ class JarvisAssistant:
     def _check_version(self):
         latest = self.memory.get_latest_system_version()
         if settings.version < latest:
-            print(f"⚠️ [Jarvis] Outdated version: v{settings.version} < v{latest}")
+            print(f"[!] [Jarvis] Outdated version: v{settings.version} < v{latest}")
         else:
-            print(f"✅ [Jarvis] Version up-to-date: v{settings.version}")
+            print(f"[OK] [Jarvis] Version up-to-date: v{settings.version}")
 
     async def _auto_maintenance(self):
         """Perform automatic maintenance tasks like Guru-Watch."""
@@ -44,7 +44,7 @@ class JarvisAssistant:
                 should_run = True
         
         if should_run:
-            print("🕵️ [Jarvis] Triggering scheduled Guru-Watch...")
+            print("[Maintenance] [Jarvis] Triggering scheduled Guru-Watch...")
             env = os.environ.copy()
             env["PYTHONPATH"] = os.getcwd() + os.pathsep + env.get("PYTHONPATH", "")
             subprocess.run([sys.executable, "harness/scripts/skill_guru_watch.py"], env=env)
@@ -62,13 +62,52 @@ class JarvisAssistant:
         else:
             result = {"status": "SUCCESS", "details": f"OS task '{prompt}' completed."}
 
+        # Run agnostic audits & attach diagnostics to learning insight
+        diagnostics = self._run_agnostic_audits()
+        result["diagnostics"] = diagnostics
+
         await self._learn(prompt, result)
         return result
 
+    def _run_agnostic_audits(self) -> dict:
+        """Agnostic audit feature: checks local/offline network loops & memory optimization alerts."""
+        print("[Audit] [Jarvis] Running agnostic system audits...")
+        diagnostics = {"webrtc_stun_reachable": True, "performance_warnings": []}
+        
+        # 1. Check STUN server connectivity to prevent WebRTC hangs
+        import socket
+        try:
+            socket.setdefaulttimeout(1.0)
+            socket.gethostbyname("stun.l.google.com")
+            print("[Network] [Jarvis Audit] STUN server hostname resolved successfully.")
+        except Exception:
+            diagnostics["webrtc_stun_reachable"] = False
+            diagnostics["performance_warnings"].append(
+                "STUN server stun.l.google.com:19302 is unreachable. WebRTC data channels "
+                "should fall back to local loopback configurations to avoid signaling hangs."
+            )
+            print("[!] [Jarvis Audit] STUN server is unreachable. Offline mode recommended.")
+
+        # 2. Performance memory buffer static check on generated app_result files
+        app_result_dir = Path("app_result")
+        if app_result_dir.exists():
+            for js_file in app_result_dir.glob("**/*.js"):
+                try:
+                    content = js_file.read_text(encoding="utf-8")
+                    if "requestAnimationFrame" in content and "new Array" in content:
+                        diagnostics["performance_warnings"].append(
+                            f"File {js_file.name} uses dynamic arrays inside animation frames. "
+                            "Consider converting to flat TypedArrays to improve L1 cache hit rate."
+                        )
+                except Exception:
+                    pass
+
+        return diagnostics
+
     async def _learn(self, prompt: str, result: dict):
-        insight = f"Interaction: {prompt} | Result: {result.get('status')}"
-        self.memory.push_memory("GLOBAL_JARVIS", "REFLECTION", insight, {"input": prompt})
-        print("🧠 [Jarvis] Memory persisted.")
+        insight = f"Interaction: {prompt} | Result: {result.get('status')} | StunReachable: {result.get('diagnostics', {}).get('webrtc_stun_reachable', True)}"
+        self.memory.push_memory("GLOBAL_JARVIS", "REFLECTION", insight, {"input": prompt, "diagnostics": result.get("diagnostics")})
+        print("[Memory] [Jarvis] Memory persisted.")
 
 if __name__ == "__main__":
     mem = MemoryService()

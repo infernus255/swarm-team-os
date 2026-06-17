@@ -1,7 +1,7 @@
 // =====================================================
 // 1. CONSTANTS & CONFIGURATION
 // =====================================================
-const WORLD_W = 512;
+const WORLD_W = 1024;
 const WORLD_H = 320;
 const GRAVITY = 0.4;
 const PLAYER_SPEED = 1.8;
@@ -59,8 +59,8 @@ for (let m = 0; m < 18; m++) {
 
 // Palette materials player can place
 const PALETTE = [MAT.SAND, MAT.WATER, MAT.STONE, MAT.WOOD, MAT.FIRE, MAT.OIL, MAT.GUNPOWDER, MAT.LAVA, MAT.ACID, MAT.DIRT, MAT.GLASS, MAT.ICE, MAT.EMBER];
-const TOOL_PLACE = 0, TOOL_MINE = 1, TOOL_BOMB = 2;
-const TOOL_ICONS = ['🖌️','⛏️','💣'];
+const TOOL_PLACE = 0, TOOL_MINE = 1, TOOL_BOMB = 2, TOOL_STAFF = 3;
+const TOOL_ICONS = ['🖌️','⛏️','💣','🔥'];
 
 // Color generators (packed ABGR for little-endian Uint32Array → RGBA in ImageData)
 function packC(r,g,b,a){return((a<<24)|(b<<16)|(g<<8)|r)>>>0;}
@@ -181,8 +181,9 @@ function simulate() {
             const i = y * WORLD_W + x;
             if (clock[i] === frameClock) continue;
             const m = grid[i];
-            if (m === MAT.EMPTY || m === MAT.BEDROCK) continue;
+            if (m === MAT.EMPTY) continue;
             const t = PROP_TYPE[m];
+            if (t === 1) continue; // Skip static solids (Stone, Wood, Dirt, Grass, Glass, Ice, Bedrock)
             if (t === 2) simPowder(x, y, i, m);
             else if (t === 3) simLiquid(x, y, i, m);
             else if (t === 4) simGas(x, y, i, m);
@@ -326,24 +327,47 @@ function generateWorld() {
             if (y >= WORLD_H - 3) { setCell(i, MAT.BEDROCK); continue; }
             if (y < surfY) continue; // sky
 
-            if (y === surfY) { setCell(i, MAT.GRASS); }
-            else if (y < surfY + 5) { setCell(i, MAT.DIRT); }
-            else {
-                // Underground
+            if (y < 90) {
+                // Biome 1: Surface Forest
+                if (y === surfY) { setCell(i, MAT.GRASS); }
+                else if (y < surfY + 5) { setCell(i, MAT.DIRT); }
+                else { setCell(i, MAT.STONE); }
+            } else if (y < 170) {
+                // Biome 2: Crystal Caverns
                 const caveN = noise.noise(x * 0.05, y * 0.05);
                 const caveN2 = noise2.noise(x * 0.08, y * 0.08);
                 if (caveN > 0.25 && caveN2 > -0.1) {
-                    // Cave - sprinkle water in deep caves
-                    if (y > WORLD_H * 0.75 && rng() < 0.025) setCell(i, MAT.LAVA);
-                    else if (y > WORLD_H * 0.5 && rng() < 0.02) setCell(i, MAT.WATER);
+                    if (rng() < 0.02) setCell(i, MAT.WATER);
                     continue;
                 }
-                // Minerals and ore veins
                 const mn = noise2.noise(x * 0.12, y * 0.12);
                 const mn3 = noise3.noise(x * 0.18, y * 0.18);
-                if (mn > 0.45 && y > surfY + 20) setCell(i, MAT.SAND);
-                else if (mn3 > 0.55 && y > surfY + 15) setCell(i, MAT.GLASS); // quartz veins
-                else if (y > WORLD_H * 0.65 && rng() < 0.004) setCell(i, MAT.LAVA);
+                if (mn3 > 0.5) setCell(i, MAT.GLASS);
+                else if (mn > 0.45) setCell(i, MAT.ICE);
+                else if (rng() < 0.05) setCell(i, MAT.SAND);
+                else setCell(i, MAT.STONE);
+            } else if (y < 245) {
+                // Biome 3: Poison/Toxic Caves
+                const caveN = noise.noise(x * 0.05, y * 0.05);
+                const caveN2 = noise2.noise(x * 0.08, y * 0.08);
+                if (caveN > 0.25 && caveN2 > -0.1) {
+                    if (rng() < 0.04) setCell(i, MAT.ACID);
+                    else if (rng() < 0.03) setCell(i, MAT.OIL);
+                    continue;
+                }
+                if (rng() < 0.08) setCell(i, MAT.DIRT);
+                else setCell(i, MAT.STONE);
+            } else {
+                // Biome 4: Lava Core
+                const caveN = noise.noise(x * 0.05, y * 0.05);
+                const caveN2 = noise2.noise(x * 0.08, y * 0.08);
+                if (caveN > 0.25 && caveN2 > -0.1) {
+                    if (rng() < 0.08) setCell(i, MAT.LAVA);
+                    else if (rng() < 0.03) setCell(i, MAT.FIRE);
+                    else if (rng() < 0.03) setCell(i, MAT.EMBER);
+                    continue;
+                }
+                if (rng() < 0.08) setCell(i, MAT.EMBER);
                 else setCell(i, MAT.STONE);
             }
         }

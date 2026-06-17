@@ -33,3 +33,17 @@ app_result/
 # Logs
 *.log
 .vercel
+
+# Node
+node_modules/
+
+# WASM build output
+wasm_pkg/
+
+# Rust installer / binaries
+rustup-init.exe
+*.exe
+target/
+
+# Locks de estado dinámico
+state.lock

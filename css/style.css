@@ -63,3 +63,265 @@ html, body { width: 100%; height: 100%; height: 100dvh; overflow: hidden; backgr
     #controls-top { flex-wrap: nowrap; }
     #mp-panel { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); right: auto; margin-top: 0; width: 90%; max-width: 300px; box-shadow: 0 10px 40px rgba(0,0,0,0.7); background: rgba(10, 10, 20, 0.92); }
 }
+
+/* --- V1.2 Playability Styles --- */
+#inventory-slots {
+    display: flex;
+    gap: 8px;
+    padding: 6px 12px;
+}
+.inv-slot {
+    width: 52px;
+    height: 52px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--glass-border);
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s, transform 0.1s;
+}
+.inv-slot:active {
+    transform: scale(0.95);
+}
+.inv-slot.has-item {
+    border-color: var(--accent);
+    background: rgba(255, 215, 0, 0.08);
+}
+.inv-slot .key {
+    position: absolute;
+    top: 2px;
+    left: 4px;
+    font-size: 8px;
+    color: #8a8fb0;
+    font-weight: 700;
+}
+.inv-slot .icon {
+    font-size: 10px;
+    text-align: center;
+    line-height: 1.1;
+    color: #eee;
+    margin-top: 6px;
+    max-width: 90%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+#settings-panel {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 320px;
+    display: none;
+    flex-direction: column;
+    gap: 16px;
+    padding: 24px;
+    z-index: 110;
+}
+#settings-panel.show {
+    display: flex;
+}
+#settings-panel h2 {
+    font-size: 18px;
+    color: var(--accent);
+    margin: 0;
+    text-align: center;
+}
+.settings-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+.settings-group label {
+    font-size: 11px;
+    color: #8a8fb0;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+.settings-row {
+    display: flex;
+    gap: 8px;
+}
+.settings-row .btn {
+    flex: 1;
+}
+#volume-slider {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 6px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 3px;
+    outline: none;
+}
+#volume-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--accent);
+    cursor: pointer;
+    box-shadow: 0 0 8px var(--accent-glow);
+}
+
+/* Screen Overlays */
+.screen-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(4, 4, 8, 0.85);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 120;
+}
+.screen-overlay.show {
+    display: flex;
+}
+.overlay-content {
+    width: 90%;
+    max-width: 380px;
+    padding: 32px 24px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 18px;
+    animation: zoomIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes zoomIn {
+    from { transform: scale(0.8); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+.danger-text {
+    font-size: 28px;
+    font-weight: 800;
+    background: linear-gradient(45deg, #ff4757, #ff6b81);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: 1.5px;
+    text-shadow: 0 2px 20px rgba(255,71,87,0.3);
+}
+.victory-text {
+    font-size: 32px;
+    font-weight: 800;
+    background: linear-gradient(45deg, #ffd700, #ffb300);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: 2px;
+    text-shadow: 0 2px 25px rgba(255,215,0,0.4);
+}
+.overlay-stats {
+    font-size: 14px;
+    color: #a0a5c0;
+    font-weight: 600;
+}
+.overlay-stats span {
+    color: var(--accent);
+    font-size: 18px;
+    font-family: monospace;
+}
+
+@media (max-width: 768px) {
+    #hud-middle-row {
+        flex-direction: column-reverse;
+        align-items: center;
+        gap: 6px;
+    }
+    .inv-slot {
+        width: 44px;
+        height: 44px;
+    }
+    .inv-slot .icon {
+        font-size: 9px;
+        margin-top: 4px;
+    }
+    #settings-panel {
+        width: 90%;
+        max-width: 300px;
+    }
+}
+
+/* --- V1.3 Egypt Cyber-Civilization Styles --- */
+#relics-hud {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: rgba(10, 10, 20, 0.8);
+    border: 1px solid var(--glass-border);
+    border-radius: 8px;
+    padding: 6px 12px;
+}
+.relic-icon {
+    font-size: 20px;
+    color: rgba(255, 255, 255, 0.15);
+    filter: grayscale(100%);
+    opacity: 0.25;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    cursor: default;
+    text-shadow: none;
+}
+.relic-icon.active {
+    opacity: 1.0;
+    filter: none;
+    transform: scale(1.25);
+    animation: relicGlow 2s infinite ease-in-out alternate;
+}
+#ankh_of_life.relic-icon.active {
+    color: #ffd700;
+}
+#eye_of_horus.relic-icon.active {
+    color: #00d2d3;
+}
+#scarab_of_power.relic-icon.active {
+    color: #1dd1a1;
+}
+
+@keyframes relicGlow {
+    0% { text-shadow: 0 0 5px currentColor, 0 0 10px currentColor; }
+    100% { text-shadow: 0 0 12px currentColor, 0 0 20px currentColor; }
+}
+
+#boss-hp-container {
+    display: none;
+    position: fixed;
+    top: 90px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80%;
+    max-width: 400px;
+    background: rgba(8, 8, 16, 0.9);
+    border: 1.5px solid #ff3838;
+    border-radius: 8px;
+    padding: 6px 10px;
+    box-shadow: 0 0 20px rgba(255,56,56,0.3);
+    z-index: 105;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    animation: slideDown 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+@keyframes slideDown {
+    from { transform: translate(-50%, -20px); opacity: 0; }
+    to { transform: translate(-50%, 0); opacity: 1; }
+}
+
+#boss-hp-fill {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, #d30000, #ff3838);
+    border-radius: 3px;
+    transition: width 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+}
+

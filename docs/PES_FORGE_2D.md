@@ -1,4 +1,4 @@
-# Product & Engineering Specification: Project Forge 2D (PES 1.0)
+# Product & Engineering Specification: Project Forge 2D (PES 1.4)
 
 ---
 
@@ -7,7 +7,7 @@
 | Campo                  | Valor                                                     |
 | ---------------------- | --------------------------------------------------------- |
 | Producto / Feature     | Project Forge 2D (Noita-style Sandbox Game)               |
-| Versión                | 1.0.0                                                     |
+| Versión                | 1.4.0                                                     |
 | Estado                 | Approved                                                  |
 | Product Owner          | User                                                      |
 | Tech Lead              | Antigravity (Advanced Agentic Coding)                     |
@@ -36,7 +36,7 @@ El proyecto se considera exitoso si:
 * [x] Funciona de manera autónoma y portable en un solo archivo `index.html` bajo los 80 KB.
 * [x] Logra 60 FPS estables en la simulación de colisiones de 163k celdas simultáneas en dispositivos móviles de gama media.
 * [x] Mantiene la coherencia de red en multijugador P2P online por WebRTC tras el intercambio inicial de SDP/ICE.
-* [x] Pasa exitosamente la suite de 28 pruebas automatizadas de físicas y estructura del repositorio.
+* [x] Pasa exitosamente la suite de 31 pruebas automatizadas de físicas y estructura del repositorio.
 
 ---
 
@@ -94,8 +94,11 @@ Si desarrollamos un motor físico de autómatas celulares optimizado con TypedAr
 * Motor CA de 18 materiales con interacciones físicas y químicas realistas (gravedad, densidad, combustión, acidez).
 * Colisiones elásticas AABB para los jugadores.
 * Joystick táctil virtual dinámico y controles de teclado.
-* Sintetizador de audio procedural (efectos de sonido para saltos, minado, explosiones y colocación).
+* Sintetizador de audio procedural (efectos de sonido para saltos, minado, explosiones, colocación, apertura de cofres y transiciones de fase del jefe).
 * Multijugador WebRTC P2P (Host/Join mediante SDP base64) y local en pantalla dividida.
+* **Modo Historia Kemet-Delta**: Sistema narrativo con cofres de ciber-sarcófago, 3 reliquias ocultas (Ankh de Vida, Ojo de Horus, Escarabajo de Poder) que disipan un campo de fuerza para acceder al reactor geotérmico.
+* **Jefe Pharaoh Guardian**: Entidad cibernética de 400 HP con comportamiento flotante, disparos guiados de energía y una fase de furia que invoca murciélagos y lanza fuego.
+* **Sincronización Neon DB**: Sincronizar el conocimiento y las lecciones aprendidas de ingeniería y lore a la base de datos distribuida PostgreSQL (Neon) a través de vectores de embeddings.
 
 ## SHOULD
 
@@ -180,6 +183,21 @@ Para **cooperar en el mismo sandbox físico sin latencia de servidores intermedi
 
 ---
 
+## Story 3: Revelar los Secretos de Kemet-Delta
+
+Como **jugador (solo o cooperativo)**,  
+Quiero **explorar los biomas para encontrar reliquias ocultas en cofres, abrir el campo de fuerza del reactor y vencer al Pharaoh Guardian**,  
+Para **revelar los secretos de la antigua civilización cibernética y ganar la partida**.
+
+### Acceptance Criteria
+
+* Los cofres (Cyber-Sarcophagus) están esparcidos por los 3 biomas superiores y contienen las reliquias correspondientes (Ankh de Vida, Ojo de Horus, Escarabajo de Poder).
+* Un campo de fuerza impenetrable en el núcleo del reactor repele a los jugadores que intenten cruzarlo en modo historia a menos que tengan las 3 reliquias.
+* El Pharaoh Guardian flota, ataca con proyectiles de energía morados teledirigidos, entra en fase de furia por debajo de 50% de HP (lanzando fuego y murciélagos) y tiene una barra de vida dedicada.
+* Al derrotar al jefe, este suelta el Ankh de Ra, cuya recolección activa la pantalla de victoria del modo historia.
+
+---
+
 # 10. Functional Requirements
 
 ## Feature: Motor CA con Fluidos y Reacciones
@@ -197,6 +215,92 @@ Para **cooperar en el mismo sandbox físico sin latencia de servidores intermedi
 * **Gravedad**: Los polvos caen verticalmente o en diagonal si la celda inferior está ocupada.
 * **Densidad**: La lava se hunde en el agua (creando roca y vapor); los polvos se hunden en líquidos.
 * **Combustión**: El fuego y la brasa encienden materiales inflamables (madera, hierba, pólvora, petróleo).
+
+---
+
+## Feature: Modo Historia y Reliquias de Kemet-Delta
+
+### Inputs
+* Reliquias recogidas: `eye_of_horus`, `scarab_of_power`, `ankh_of_life` (booleanos en `game.storyArtifacts`).
+* Posición del jugador `(x, y)`.
+
+### Outputs
+* Desactivación del campo de fuerza en `x in [445, 575]`, `y >= 250` cuando se poseen las 3 reliquias.
+* Empuje hacia atrás y mensaje de advertencia flotante si se intenta cruzar sin todas las reliquias en modo de juego Survival.
+
+---
+
+## Feature: Cofres Cyber-Sarcophagus
+
+### Inputs
+* Colisión del jugador con entidad tipo `'chest'`.
+
+### Outputs
+* Efecto sonoro `audio.playChestOpen()`.
+* Generación aleatoria de botín físico fluyendo hacia arriba y hacia los lados (poción de vida, poción de escudo, monedas).
+* Aparición del relic correspondiente al bioma si es un cofre especial (Surface Forest -> `ankh_of_life`, Crystal Caverns -> `eye_of_horus`, Poison Caves -> `scarab_of_power`).
+
+---
+
+## Feature: Jefe Pharaoh Guardian y Combate del Reactor
+
+### Inputs
+* HP del jefe (`400`).
+* Posición del jugador.
+
+### Outputs
+* **Fase 1 (HP >= 50%)**: Movimiento flotante sinusoidal; disparo de proyectiles morados guiados hacia el jugador cada 50 frames (proyectiles AABB que causan 15 de daño al impactar).
+* **Fase 2 (HP < 50% / Furia)**: El jefe brilla con un halo rojo. Su velocidad aumenta, dispara proyectiles de fuego y genera periódicamente murciélagos hostiles.
+* **Muerte**: Explota en una ráfaga de partículas de humo y fuego, reproduce un temblor de pantalla y libera el `ankh_of_ra`. Su recolección activa la pantalla de victoria.
+
+---
+
+## Feature: Habilidades de Reliquias (Relic Perks)
+
+### Inputs
+* Reliquias en `game.storyArtifacts` (`ankh_of_life`, `eye_of_horus`, `scarab_of_power`).
+* Posición del jugador, coordenadas de cofres activos e inputs de pincel/minado.
+
+### Outputs
+* **Ankh de Vida**: Regeneración pasiva de `+1 HP` cada 60 frames. Reducción fija del `25%` de daño por bloques de peligro (Fuego, Lava, Ácido).
+* **Ojo de Horus**: Delinea una trayectoria visual de escáner en cian punteado desde el jugador hasta el cofre cerrado más cercano, respetando el envolvimiento esférico horizontal del mapa (shortest-path wrapping).
+* **Escarabajo de Poder**: Expande el tamaño de pincel máximo a `12`. Reduce a la mitad el cooldown de minado (de `8` a `4` frames) y permite acciones de pintura/minado continuo manteniendo presionado el ratón/pantalla táctil.
+
+---
+
+## Feature: Esquive Cyber-Dash (Dodge Roll)
+
+### Inputs
+* Presión de tecla `Space` o interacción de esquive.
+
+### Outputs
+* Desplazamiento horizontal a alta velocidad (`facing * 8.0` px/frame) bloqueando la gravedad (`vy = 0`) durante `12` frames.
+* Cooldown de `35` frames entre usos.
+* Inmunidad temporal a daños (iframes) mediante bloqueo del temporizador `dmgTimer`.
+* Estela visual de partículas físicas del autómata (`MAT.EMBER` y `MAT.SMOKE`) generadas en su estela.
+* Siluetas en cian translúcido dibujadas detrás del jugador como efecto de desenfoque de movimiento de alta velocidad.
+
+---
+
+## Feature: Proyectiles Elementales del Báculo
+
+### Inputs
+* Uso del `TOOL_STAFF` con un material del inventario seleccionado (`MAT.FIRE`, `MAT.ACID`, `MAT.ICE`, `MAT.LAVA`).
+
+### Outputs
+* **Disparo Ígneo (Fire)**: Proyectil que enciende bloques a su paso y explota en un radio de 6 celdas propagando fuego.
+* **Disparo Ácido (Acid)**: Proyectil corrosivo que disuelve baldosas sólidas (excepto BEDROCK) en un radio de 4 celdas al impactar.
+* **Disparo Gélido (Ice)**: Proyectil congelante que ralentiza a los enemigos (`slowTimer = 180` frames) y transforma agua y petróleo en bloques de hielo (`MAT.ICE`).
+* **Disparo de Plasma (Lava)**: Inflige `25` de daño base (en lugar de 10) y funde roca (`MAT.STONE`) transformándola en lava líquida (`MAT.LAVA`).
+
+---
+
+## Feature: Torretas Obelisco y Uniones por Enlace WebRTC
+
+### Outputs
+* **Torretas Obelisco**: Enemigos estáticos que disparan ráfagas rectilíneas de energía cibernética rosa (`turret_shot`, inflige `8` de daño al jugador) cada 90-120 frames si se encuentran en rango. Spawnean en las cavernas y zona del núcleo.
+* **Enlaces de Invitación WebRTC**: Al crear una sesión de multijugador online, copiar el código genera una URL completa del tipo `origin/pathname#join=offerCode`. Al cargar dicha URL, el cliente destinatario autocompleta la oferta y arranca el canal WebRTC sin interacción manual previa.
+* **Resolución de Solapamiento**: Sistema de recuperación de atoramiento (`unstuck()`) que escanea hasta 24 píxeles verticalmente hacia arriba para empujar a entidades y jugadores fuera de bloques sólidos caídos (como arena) o colisiones de precisión con el suelo.
 
 ---
 
@@ -339,6 +443,10 @@ Fixed Physics Tick (60hz)    Render Tick
 * **Sim**: Tiempo empleado en simulación física (en milisegundos).
 * **Draw**: Tiempo empleado en dibujo y escalado de canvas.
 
+## Trazabilidad de Estado (Modo Debug)
+
+* **Panel Debug Flotante**: Activado desde el panel de configuración, muestra en tiempo real la posición exacta del jugador `(x, y)`, la velocidad `(vx, vy)`, las coordenadas de la cámara `(cam.x, cam.y)`, la cantidad de reliquias recogidas, el estado de proximidad al campo de fuerza de Ra y la cantidad de enemigos activos.
+
 ---
 
 # 20. Testing Strategy
@@ -348,6 +456,7 @@ Fixed Physics Tick (60hz)    Render Tick
 * `test_deterministic_prng`: Verifica la previsibilidad del motor aleatorio LCG.
 * `test_explosion_radius`: Comprueba el despeje y propagación de fuego en explosiones de pólvora.
 * `test_material_system_exists`: Valida la existencia y propiedades clave de los 18 materiales.
+* `test_story_mode_entities`: Valida la definición y presencia del jefe (Pharaoh Guardian), de los cofres y de las 4 reliquias narrativas del modo historia.
 
 ## Manual Tests
 

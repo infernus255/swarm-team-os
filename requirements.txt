@@ -1,6 +1,12 @@
+# Python dependencies — Project Forge 2D / SwarmTeam OS
+# Install: pip install -r requirements.txt
+
+# Swarm core
 pydantic>=2.10.0
 pydantic-ai
 python-dotenv
 requests>=2.31.0
+
+# Testing
 pytest>=8.0.0
 pytest-asyncio>=0.23.0

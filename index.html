@@ -16,19 +16,35 @@
                 <div id="perf">
                     FPS: <span id="v-fps">0</span> | Sim: <span id="v-sim">0</span>ms | Draw: <span id="v-draw">0</span>ms<br>
                     Pos: <span id="v-pos">0,0</span> | Celdas: <span id="v-cells">0</span><br>
-                    Modo: <span id="v-mode">Solo</span>
+                    Modo: <span id="v-mode">Supervivencia</span>
                 </div>
                 <div id="hp-bar"><div id="hp-fill" style="width:100%"></div></div>
+                <div id="lives-display" style="margin-top: 5px; font-size: 11px; color: #ff4757; font-weight: bold;">❤️ Vidas: <span id="v-lives">3</span></div>
+            </div>
+            <div class="panel" id="relics-hud" style="display:flex; flex-direction:column; align-items:center; min-width: 140px; justify-content:center;">
+                <div style="font-size: 9px; color: #8a8fb0; font-weight: 700; margin-bottom: 4px; letter-spacing: 0.5px;">RELIQUIAS DE KEMET</div>
+                <div style="display:flex; gap:12px; font-size: 18px; line-height: 1;">
+                    <span id="ankh_of_life" class="relic-icon" title="Ankh de Vida (Bosque Surface)">☥</span>
+                    <span id="eye_of_horus" class="relic-icon" title="Ojo de Horus (Cavernas de Cristal)">👁️</span>
+                    <span id="scarab_of_power" class="relic-icon" title="Escarabajo de Poder (Cavernas Ácidas)">🪲</span>
+                </div>
             </div>
             <div class="panel" id="mission-panel">
                 <div id="score-display">Score: <span id="v-score">0</span></div>
                 <div id="mission-display">Misión: Cargando...</div>
+            </div>
+            <div id="boss-hp-container" style="display:none; position:fixed; top: 90px; left: 50%; transform: translateX(-50%); width: 80%; max-width: 400px; background: rgba(8, 8, 16, 0.85); border: 1.5px solid #ff3838; border-radius: 8px; padding: 5px 8px; box-shadow: 0 0 15px rgba(255,56,56,0.35); z-index: 105; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);">
+                <div style="font-size: 9px; color: #ff3838; font-weight: 800; text-align: center; text-transform: uppercase; margin-bottom: 3px; letter-spacing: 1.5px; text-shadow: 0 0 4px rgba(255,56,56,0.5);">GUARDIÁN DE RA (REACTOR GEOTÉRMICO)</div>
+                <div style="width: 100%; height: 6px; background: rgba(255,255,255,0.08); border-radius: 3px; overflow: hidden; border: 1px solid rgba(255,255,255,0.05);">
+                    <div id="boss-hp-fill" style="width: 100%; height: 100%; background: linear-gradient(90deg, #d30000, #ff3838); border-radius: 3px; transition: width 0.15s;"></div>
+                </div>
             </div>
 
             <div id="controls-top">
                 <button class="btn" id="btn-sound">🔊</button>
                 <button class="btn" id="btn-music">🎵</button>
                 <button class="btn" id="btn-reset">🌀</button>
+                <button class="btn" id="btn-settings">⚙️</button>
                 <div id="mp-toggle" class="interact">
                     <button class="btn" id="btn-mp">🎮</button>
                     <div id="mp-panel" class="panel">
@@ -53,15 +69,83 @@
             <p>🕹 Joystick para moverte • 🖌 Toca para crear • ⛏ Mina • 💣 Explota • 1-9 para materiales</p>
         </div>
         <div id="bottom-bar" class="interact">
-            <div id="tools-row">
-                <div id="tools"></div>
-                <div id="brush-row">
-                    <label>Brush</label>
-                    <input type="range" id="brush-slider" min="1" max="8" value="3" step="1">
-                    <span id="brush-val">3</span>
+            <div id="hud-middle-row" style="display:flex; justify-content:space-between; align-items:center; width:100%; max-width:680px; gap:10px; margin-bottom: 5px;">
+                <div id="inventory-slots" class="panel" style="display:flex; gap:8px;">
+                    <div class="inv-slot" id="slot-0" data-slot="0"><span class="key">Q</span><div class="icon">Vacio</div></div>
+                    <div class="inv-slot" id="slot-1" data-slot="1"><span class="key">R</span><div class="icon">Vacio</div></div>
+                </div>
+                <div id="tools-row">
+                    <div id="tools"></div>
+                    <div id="brush-row">
+                        <label>Brush</label>
+                        <input type="range" id="brush-slider" min="1" max="8" value="3" step="1">
+                        <span id="brush-val">3</span>
+                    </div>
                 </div>
             </div>
             <div id="palette"></div>
+        </div>
+    </div>
+
+    <!-- Overlay Windows (V1.2) -->
+    <div id="settings-panel" class="panel interact">
+        <h2>⚙️ Configuración</h2>
+        <div class="settings-group">
+            <label>Modo de Juego</label>
+            <div class="settings-row">
+                <button id="opt-survival" class="btn active">Supervivencia</button>
+                <button id="opt-sandbox" class="btn">Sandbox</button>
+            </div>
+        </div>
+        <div class="settings-group" id="diff-group">
+            <label>Dificultad</label>
+            <div class="settings-row">
+                <button id="opt-easy" class="btn">Fácil</button>
+                <button id="opt-normal" class="btn active">Normal</button>
+                <button id="opt-hard" class="btn">Difícil</button>
+            </div>
+        </div>
+        <div class="settings-group">
+            <label>Volumen General</label>
+            <input type="range" id="volume-slider" min="0" max="1" step="0.05" value="1.0">
+        </div>
+        <div class="settings-group">
+            <label>Trazabilidad / Sistema</label>
+            <div class="settings-row">
+                <button id="opt-debug" class="btn">Activar Debug</button>
+            </div>
+        </div>
+        <button id="btn-close-settings" class="btn">Cerrar</button>
+    </div>
+
+    <!-- Debug Overlay Panel (V1.3.1) -->
+    <div id="debug-overlay" class="panel" style="display:none; position:fixed; top: 180px; left: 10px; font-size: 10px; font-family: monospace; color: #00ffcc; background: rgba(5, 15, 10, 0.85); border: 1px solid rgba(0, 255, 204, 0.3); border-radius: 6px; padding: 8px 12px; z-index: 100; pointer-events: none; min-width: 170px; box-shadow: 0 0 10px rgba(0, 255, 204, 0.15); line-height: 1.4;">
+        <div style="font-weight: bold; border-bottom: 1px solid rgba(0,255,204,0.2); padding-bottom: 3px; margin-bottom: 5px; color: #fff;">📊 LIVE DEBUG STATUS</div>
+        <div>Player X: <span id="db-px">0</span></div>
+        <div>Player Y: <span id="db-py">0</span></div>
+        <div>Player Vel: <span id="db-pvel">0, 0</span></div>
+        <div>Camera X: <span id="db-camx">0</span></div>
+        <div>Camera Y: <span id="db-camy">0</span></div>
+        <div>Relics: <span id="db-relics">0/3</span></div>
+        <div>Forcefield: <span id="db-forcefield">Off</span></div>
+        <div>Enemies: <span id="db-enemies">0</span></div>
+    </div>
+
+    <div id="gameover-overlay" class="screen-overlay interact">
+        <div class="overlay-content panel">
+            <h1 class="danger-text">FIN DE LA PARTIDA</h1>
+            <p>Te has quedado sin vidas. ¡El caos te ha consumido!</p>
+            <div class="overlay-stats">Puntuación: <span id="go-score">0</span></div>
+            <button id="btn-restart-go" class="btn active">Intentar de Nuevo</button>
+        </div>
+    </div>
+
+    <div id="victory-overlay" class="screen-overlay interact">
+        <div class="overlay-content panel">
+            <h1 class="victory-text">¡VICTORIA!</h1>
+            <p>Has recuperado la Reliquia Antigua de las profundidades del núcleo.</p>
+            <div class="overlay-stats">Puntuación Final: <span id="vic-score">0</span></div>
+            <button id="btn-restart-vic" class="btn active">Jugar Otra Vez</button>
         </div>
     </div>
 

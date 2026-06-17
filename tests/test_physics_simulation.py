@@ -33,7 +33,7 @@ class TestCellularAutomataPhysics(unittest.TestCase):
     def test_constants_exist(self):
         """All core physics constants must be defined."""
         consts = self.get_constants()
-        self.assertEqual(consts["WORLD_W"], 512, "World width should be 512")
+        self.assertEqual(consts["WORLD_W"], 1024, "World width should be 1024")
         self.assertEqual(consts["WORLD_H"], 320, "World height should be 320")
         self.assertGreater(consts["GRAVITY"], 0, "Gravity must be positive")
         self.assertLess(consts["PLAYER_JUMP"], 0, "Jump velocity must be negative (upward)")
@@ -256,6 +256,94 @@ class TestGameStructure(unittest.TestCase):
         content = self.get_content()
         self.assertIn("Uint8Array", content, "Must use Uint8Array for grid data")
         self.assertIn("Uint32Array", content, "Must use Uint32Array for color data")
+
+
+class TestPlayabilityFeatures(unittest.TestCase):
+    """Validates the new playability, camera wrapping, and entity system features."""
+
+    def get_content(self):
+        content = INDEX_HTML_PATH.read_text(encoding="utf-8")
+        js_dir = REPO_ROOT / "js"
+        if js_dir.exists():
+            for js_file in sorted(js_dir.glob("*.js")):
+                content += "\n" + js_file.read_text(encoding="utf-8")
+        return content
+
+    def test_camera_horizontal_wrapping(self):
+        """Verify that camera wraps horizontally in Camera.follow using shortest-path wrapping."""
+        content = self.get_content()
+        self.assertIn("class Camera", content)
+        self.assertTrue("WORLD_W/2" in content or "WORLD_W / 2" in content, "Camera follow should use shortest-path wrapping")
+
+    def test_playability_entities_defined(self):
+        """Verify that Enemy, Item, and Projectile classes exist in the source code."""
+        content = self.get_content()
+        self.assertIn("class Enemy", content)
+        self.assertIn("class Item", content)
+        self.assertIn("class Projectile", content)
+
+    def test_camera_screen_x_conversion(self):
+        """Verify that getScreenX is implemented to handle wrapping coordinates on screen."""
+        content = self.get_content()
+        self.assertIn("function getScreenX", content)
+
+    def test_story_mode_entities(self):
+        """Verify that Pharaoh Guardian boss and story relics are defined and handled."""
+        content = self.get_content()
+        self.assertIn("pharaoh_guardian", content, "Pharaoh Guardian boss must be defined")
+        self.assertIn("eye_of_horus", content, "Eye of Horus relic must be defined")
+        self.assertIn("scarab_of_power", content, "Scarab of Power relic must be defined")
+        self.assertIn("ankh_of_life", content, "Ankh of Life relic must be defined")
+        self.assertIn("ankh_of_ra", content, "Ankh of Ra core relic must be defined")
+        self.assertIn("chest", content, "Chests must be defined")
+
+class TestGameplayEnhancements(unittest.TestCase):
+    """Validates the new AAA gameplay mechanics, relic perks, and physics fixes."""
+
+    def get_content(self):
+        content = INDEX_HTML_PATH.read_text(encoding="utf-8")
+        js_dir = REPO_ROOT / "js"
+        if js_dir.exists():
+            for js_file in sorted(js_dir.glob("*.js")):
+                content += "\n" + js_file.read_text(encoding="utf-8")
+        return content
+
+    def test_dash_roll_mechanics(self):
+        """Verify that player dash/roll mechanics and spacebar input bindings exist."""
+        content = self.get_content()
+        self.assertIn("dash()", content, "Player must have a dash/roll method")
+        self.assertIn("dashTimer", content, "Player must have a dashTimer for iframes/trails")
+        self.assertIn("dashCooldown", content, "Player must have a dashCooldown")
+        self.assertIn("Space", content, "Spacebar key handler must be registered for dash")
+
+    def test_relic_perks_logic(self):
+        """Verify that active/passive perks for story relics are implemented in update/HUD loops."""
+        content = self.get_content()
+        self.assertIn("ankhRegenTimer", content, "Ankh of Life must have a regen timer")
+        self.assertIn("ankh_of_life) dmg *= 0.75", content, "Ankh of Life must offer 25% hazard reduction")
+        self.assertIn("eye_of_horus", content, "Eye of Horus must be referenced in render/draw")
+        self.assertIn("slider.max = \"12\"", content, "Scarab of Power must set brush slider max to 12")
+        self.assertIn("mineCooldown = this.storyArtifacts.scarab_of_power ? 4 : 8", content, "Scarab of Power must halve mining cooldown")
+
+    def test_unstuck_and_collision_recovery(self):
+        """Verify that player and enemy unstuck methods scan upwards to resolve overlaps."""
+        content = self.get_content()
+        self.assertIn("unstuck()", content, "Player/Enemy must have an unstuck recovery check")
+        self.assertIn("checkCollision", content, "Collision checking helper must exist")
+        self.assertIn("this.unstuck()", content, "unstuck must be invoked in the update loop")
+
+    def test_active_cyber_obelisk_turrets(self):
+        """Verify that cyber obelisk turrets spawn and fire linear turret shots."""
+        content = self.get_content()
+        self.assertIn("turret", content, "Turret enemy type must be defined")
+        self.assertIn("turret_shot", content, "Turret shot projectile type must be defined")
+        self.assertIn("Enemy(x, y, 'turret')", content, "Turrets must spawn in the world zones")
+
+    def test_webrtc_invite_urls(self):
+        """Verify that invite URL hash links are parsed on load and copied on host copy."""
+        content = self.get_content()
+        self.assertIn("#join=", content, "Invite URLs must use #join= query hash")
+        self.assertIn("window.location.hash.startsWith('#join=')", content, "Startup sequence must parse join invite links")
 
 
 if __name__ == "__main__":

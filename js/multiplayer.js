@@ -17,7 +17,8 @@ class Multiplayer {
     }
     async host() {
         this.isHost = true; this.mode = 'online';
-        const cfg = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] };
+        const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+        const cfg = { iceServers: isLocal ? [] : [{ urls: 'stun:stun.l.google.com:19302' }] };
         this.pc = new RTCPeerConnection(cfg);
         this.dc = this.pc.createDataChannel('g', { ordered: false, maxRetransmits: 0 });
         this._setupDC(this.dc);
@@ -43,7 +44,8 @@ class Multiplayer {
     }
     async join(offerCode) {
         this.mode = 'online';
-        const cfg = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] };
+        const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+        const cfg = { iceServers: isLocal ? [] : [{ urls: 'stun:stun.l.google.com:19302' }] };
         this.pc = new RTCPeerConnection(cfg);
         this.pc.ondatachannel = e => { this.dc = e.channel; this._setupDC(this.dc); };
         const offer = JSON.parse(atob(offerCode));

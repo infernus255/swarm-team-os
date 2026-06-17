@@ -2,8 +2,21 @@
 // 8. SOUND SYNTHESIZER
 // =====================================================
 class Audio {
-    constructor() { this.ctx = null; this.muted = false; this.musicMuted = false; this.musicTimer = null; }
-    init() { if (!this.ctx) this.ctx = new (window.AudioContext||window.webkitAudioContext)(); }
+    constructor() { this.ctx = null; this.muted = false; this.musicMuted = false; this.musicTimer = null; this.masterGain = null; }
+    init() {
+        if (!this.ctx) {
+            this.ctx = new (window.AudioContext||window.webkitAudioContext)();
+            this.masterGain = this.ctx.createGain();
+            this.masterGain.connect(this.ctx.destination);
+            this.masterGain.gain.value = 1.0;
+        }
+    }
+    setVolume(vol) {
+        this.init();
+        if (this.masterGain) {
+            this.masterGain.gain.setValueAtTime(vol, this.ctx.currentTime);
+        }
+    }
     _play(type, f1, f2, dur, vol) {
         if (this.muted) return;
         this.init();
@@ -11,7 +24,9 @@ class Audio {
         const now = this.ctx.currentTime;
         const osc = this.ctx.createOscillator();
         const gain = this.ctx.createGain();
-        osc.connect(gain); gain.connect(this.ctx.destination);
+        osc.connect(gain);
+        if (this.masterGain) gain.connect(this.masterGain);
+        else gain.connect(this.ctx.destination);
         osc.type = type;
         osc.frequency.setValueAtTime(f1, now);
         osc.frequency.exponentialRampToValueAtTime(Math.max(f2,1), now+dur);
@@ -23,9 +38,24 @@ class Audio {
     playMine() { this._play('sawtooth', 90+rng()*30, 30, 0.06, 0.1); }
     playBreak() { this._play('sawtooth', 110, 20, 0.12, 0.18); }
     playJump() { this._play('sine', 160, 360, 0.1, 0.1); }
+    playDash() {
+        this._play('sine', 150, 600, 0.12, 0.15);
+        this._play('triangle', 300, 900, 0.08, 0.08);
+    }
     playExplode() {
         this._play('sawtooth', 80, 15, 0.3, 0.25);
         this._play('square', 60, 10, 0.25, 0.15);
+    }
+    playShoot() {
+        this._play('sine', 480, 240, 0.15, 0.1);
+    }
+    playChestOpen() {
+        this._play('square', 220, 660, 0.25, 0.12);
+        this._play('triangle', 330, 880, 0.2, 0.1);
+    }
+    playBossPhase() {
+        this._play('sawtooth', 180, 90, 0.4, 0.2);
+        this._play('square', 120, 60, 0.5, 0.15);
     }
     playMissionComplete() {
         if (this.muted) return;
@@ -36,7 +66,9 @@ class Audio {
         notes.forEach((freq, idx) => {
             const osc = this.ctx.createOscillator();
             const gain = this.ctx.createGain();
-            osc.connect(gain); gain.connect(this.ctx.destination);
+            osc.connect(gain);
+            if (this.masterGain) gain.connect(this.masterGain);
+            else gain.connect(this.ctx.destination);
             osc.type = 'sine';
             osc.frequency.setValueAtTime(freq, now + idx * 0.08);
             gain.gain.setValueAtTime(0.06, now + idx * 0.08);
@@ -73,7 +105,9 @@ class Audio {
             chord.forEach((freq) => {
                 const osc = this.ctx.createOscillator();
                 const gain = this.ctx.createGain();
-                osc.connect(gain); gain.connect(this.ctx.destination);
+                osc.connect(gain);
+                if (this.masterGain) gain.connect(this.masterGain);
+                else gain.connect(this.ctx.destination);
                 osc.type = 'sine';
                 osc.frequency.setValueAtTime(freq, now);
                 const vol = 0.025 / chord.length;
@@ -88,7 +122,9 @@ class Audio {
                 const note = melody[Math.floor(rng() * melody.length)];
                 const osc = this.ctx.createOscillator();
                 const gain = this.ctx.createGain();
-                osc.connect(gain); gain.connect(this.ctx.destination);
+                osc.connect(gain);
+                if (this.masterGain) gain.connect(this.masterGain);
+                else gain.connect(this.ctx.destination);
                 osc.type = 'sine';
                 const delay = 0.5 + rng() * 1.5;
                 osc.frequency.setValueAtTime(note, now + delay);
