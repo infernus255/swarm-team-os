@@ -41,7 +41,7 @@ class Player {
         // In liquid?
         const cx = (this.x + PLAYER_W/2)|0, cy = (this.y + PLAYER_H/2)|0;
         const ci = idx(cx, cy);
-        const inLiquid = ci >= 0 && PROPS[grid[ci]]?.t === 3;
+        const inLiquid = ci >= 0 && PROP_TYPE[grid[ci]] === 3;
         if (inLiquid) {
             this.vy += GRAVITY * 0.25;
             this.vy *= 0.9;
@@ -107,7 +107,7 @@ class Player {
     isSolid(x, y) {
         const i = idx(x|0, y|0);
         if (i < 0) return true;
-        const t = PROPS[grid[i]]?.t;
+        const t = PROP_TYPE[grid[i]];
         return t === 1 || t === 2; // solid or powder
     }
 

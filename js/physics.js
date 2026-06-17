@@ -40,6 +40,23 @@ PROPS[MAT.ICE]       = { n:'Hielo',    t:1, d:3,   fl:0, ar:1 };
 PROPS[MAT.EMBER]     = { n:'Brasa',    t:2, d:2,   fl:0, ar:1 };
 PROPS[MAT.BEDROCK]   = { n:'Roca',     t:1, d:99,  fl:0, ar:1 };
 
+// High-Performance Flat TypedArrays for hot simulation loops
+const PROP_TYPE = new Uint8Array(18);
+const PROP_DENSITY = new Float32Array(18);
+const PROP_FLAMMABLE = new Uint8Array(18);
+const PROP_ACID_RESIST = new Uint8Array(18);
+const PROP_NAME = [];
+for (let m = 0; m < 18; m++) {
+    const p = PROPS[m];
+    if (p) {
+        PROP_TYPE[m] = p.t;
+        PROP_DENSITY[m] = p.d;
+        PROP_FLAMMABLE[m] = p.fl;
+        PROP_ACID_RESIST[m] = p.ar;
+        PROP_NAME[m] = p.n;
+    }
+}
+
 // Palette materials player can place
 const PALETTE = [MAT.SAND, MAT.WATER, MAT.STONE, MAT.WOOD, MAT.FIRE, MAT.OIL, MAT.GUNPOWDER, MAT.LAVA, MAT.ACID, MAT.DIRT, MAT.GLASS, MAT.ICE, MAT.EMBER];
 const TOOL_PLACE = 0, TOOL_MINE = 1, TOOL_BOMB = 2;
@@ -146,11 +163,12 @@ function swap(a, b) {
 }
 function canDisplace(mover, target) {
     if (target === MAT.EMPTY) return true;
-    const mp = PROPS[mover], tp = PROPS[target];
-    if (!tp || tp.t === 1) return false; // can't displace solids
-    if (mp.t === 2 && tp.t >= 3) return true; // powder sinks in liquid/gas
-    if (mp.t === 3 && tp.t === 4) return true; // liquid sinks through gas
-    if (mp.d > tp.d && tp.t !== 1) return true;
+    const tt = PROP_TYPE[target];
+    if (tt === 1) return false; // can't displace solids
+    const mt = PROP_TYPE[mover];
+    if (mt === 2 && tt >= 3) return true; // powder sinks in liquid/gas
+    if (mt === 3 && tt === 4) return true; // liquid sinks through gas
+    if (PROP_DENSITY[mover] > PROP_DENSITY[target] && tt !== 1) return true;
     return false;
 }
 
@@ -164,10 +182,10 @@ function simulate() {
             if (clock[i] === frameClock) continue;
             const m = grid[i];
             if (m === MAT.EMPTY || m === MAT.BEDROCK) continue;
-            const p = PROPS[m];
-            if (p.t === 2) simPowder(x, y, i, m);
-            else if (p.t === 3) simLiquid(x, y, i, m);
-            else if (p.t === 4) simGas(x, y, i, m);
+            const t = PROP_TYPE[m];
+            if (t === 2) simPowder(x, y, i, m);
+            else if (t === 3) simLiquid(x, y, i, m);
+            else if (t === 4) simGas(x, y, i, m);
             simInteract(x, y, i, m);
         }
     }
@@ -198,7 +216,7 @@ function simLiquid(x, y, i, m) {
 }
 function simGas(x, y, i, m) {
     const a = idx(x, y-1);
-    if (a >= 0 && (grid[a] === MAT.EMPTY || (PROPS[grid[a]]?.t === 3))) { swap(i, a); return; }
+    if (a >= 0 && (grid[a] === MAT.EMPTY || (PROP_TYPE[grid[a]] === 3))) { swap(i, a); return; }
     const d = rng() < 0.5 ? 1 : -1;
     const d1 = idx(x+d, y-1);
     if (d1 >= 0 && grid[d1] === MAT.EMPTY) { swap(i, d1); return; }
@@ -231,7 +249,7 @@ function simInteract(x, y, i, m) {
         if (nm === MAT.EMPTY) continue;
 
         // Fire/Lava ignites flammable
-        if ((m === MAT.FIRE || m === MAT.LAVA || m === MAT.EMBER) && PROPS[nm]?.fl && rng() < 0.04) {
+        if ((m === MAT.FIRE || m === MAT.LAVA || m === MAT.EMBER) && PROP_FLAMMABLE[nm] && rng() < 0.04) {
             setCell(ni, MAT.FIRE);
         }
         // Fire + Water = Steam
@@ -245,7 +263,7 @@ function simInteract(x, y, i, m) {
         // Fire + Ice = Water
         if ((m === MAT.FIRE || m === MAT.EMBER) && nm === MAT.ICE && rng()<0.08) { setCell(ni, MAT.WATER); }
         // Acid dissolves non-resistant materials
-        if (m === MAT.ACID && !PROPS[nm]?.ar && nm !== MAT.EMPTY && rng() < 0.06) {
+        if (m === MAT.ACID && !PROP_ACID_RESIST[nm] && nm !== MAT.EMPTY && rng() < 0.06) {
             setCell(ni, MAT.EMPTY);
             if (rng()<0.4) setCell(i, rng()<0.5 ? MAT.SMOKE : MAT.EMPTY);
             return;
@@ -270,10 +288,10 @@ function explode(cx, cy, radius) {
             if (ratio < 0.55) {
                 setCell(ni, MAT.EMPTY);
             } else if (ratio < 0.8) {
-                if (PROPS[grid[ni]]?.fl) setCell(ni, MAT.FIRE);
+                if (PROP_FLAMMABLE[grid[ni]]) setCell(ni, MAT.FIRE);
                 else if (grid[ni] !== MAT.EMPTY) setCell(ni, MAT.EMBER);
             } else {
-                if (PROPS[grid[ni]]?.fl && rng()<0.5) setCell(ni, MAT.FIRE);
+                if (PROP_FLAMMABLE[grid[ni]] && rng()<0.5) setCell(ni, MAT.FIRE);
             }
         }
     }
