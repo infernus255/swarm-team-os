@@ -26,3 +26,6 @@ La capa L1 se alimenta automáticamente de fuentes externas de élite mediante e
 
 ---
 *La memoria es el único activo que crece con cada ejecución.*
+
+### 2026-06-17T05:45:06.023222Z
+- Lecciones Aprendidas: 1. Render optimizado de autómatas celulares sin loops redundantes para celdas vacías (color=0). 2. Motores HTML5 autocontenidos sin CDNs externos. 3. Multijugador WebRTC P2P híbrido con pantalla dividida. 4. LCG PRNG para simulación física reproducible. 5. Despliegue estático en Vercel.
