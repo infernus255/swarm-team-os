@@ -3,12 +3,30 @@
     {
       "src": "index.html",
       "use": "@vercel/static"
-    }
-  ],
-  "routes": [
+    },
     {
-      "src": "/(.*)",
-      "dest": "/index.html"
+      "src": "css/style.css",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "js/physics.js",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "js/audio.js",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "js/multiplayer.js",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "js/game.js",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "js/main.js",
+      "use": "@vercel/static"
     }
   ]
 }
