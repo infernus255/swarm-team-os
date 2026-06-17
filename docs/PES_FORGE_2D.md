@@ -355,6 +355,41 @@ Fixed Physics Tick (60hz)    Render Tick
 
 ---
 
+# 21. Accessibility
+
+## Visual
+* Contraste elevado en el HUD usando un fondo oscuro traslúcido (`rgba(20, 20, 25, 0.85)`) y texto en blanco o verde brillante.
+* Colores de materiales claramente diferenciados (ej. Agua azul, Lava naranja brillante, Ácido verde fosforescente) para facilitar la distinción.
+
+## Interaction
+* Soporte híbrido de controles: joystick virtual táctil dinámico para dispositivos móviles, y soporte para teclado completo (WASD/flechas y teclas numéricas) para PCs.
+* Botones de paleta táctiles de gran tamaño (mínimo 44px de área de contacto) con micro-animaciones de hover y active.
+
+## Cognitive
+* Leyendas simplificadas en pantalla que muestran de manera explícita la misión activa y los controles de manera condensada ("Tutorial").
+
+---
+
+# 22. UX Principles
+* **Retroalimentación Instantánea (Juice)**: Cada interacción genera cambios inmediatos en pantalla (partículas de humo, arpegios sonoros procedimentales, temblores de cámara y textos flotantes de puntaje/HP).
+* **Cero Fricción**: No hay pantallas de carga, pantallas de login o lobbies complejos. El juego se inicia y corre instantáneamente.
+* **Diseño Responsivo Fluido**: Adaptación de cámara y posición del HUD al rotar la pantalla entre modos vertical y horizontal.
+
+---
+
+# 23. Security Considerations
+* **Comunicación P2P Cifrada**: Intercambio directo a través del protocolo WebRTC de forma descentralizada y protegida nativamente por la seguridad del navegador (DTLS/SRTP).
+* **Ausencia de Dependencias**: Al eliminar el uso de CDNs externos, mitigamos el riesgo de inyección de código mediante vulnerabilidades de cadena de suministro (Supply Chain Attacks).
+* **Sandbox Aislado**: Ejecución del juego confinada dentro del contexto seguro del navegador sin permisos locales ni acceso al sistema de archivos local.
+
+---
+
+# 24. Privacy
+* **Cero Recolección de Datos**: No se guardan ni transmiten datos personales, cookies, ubicaciones ni metadatos del usuario.
+* **Sesiones Efímeras P2P**: Los datos de juego del multijugador fluyen directamente entre pares en memoria y expiran al cerrar la pestaña del navegador.
+
+---
+
 # 25. Deployment Strategy
 
 ## Production
@@ -380,6 +415,16 @@ Fixed Physics Tick (60hz)    Render Tick
 
 ---
 
+# 27. KPIs
+
+| Indicador | Objetivo | Evidencia / Notas |
+| --------- | -------: | ----------------- |
+| **Tiempo de Carga** | <150ms | Medido mediante CDP en <35ms. |
+| **FPS en Dispositivos Móviles** | 60 FPS | Estabilidad de fotogramas sostenida en el benchmark. |
+| **Pérdida de Paquetes WebRTC** | <2% | Basado en el transporte SCTP/UDP confiable del data channel. |
+
+---
+
 # 28. Definition of Done
 
 Una entrega de feature se considera finalizada y completada cuando:
@@ -389,3 +434,17 @@ Una entrega de feature se considera finalizada y completada cuando:
 ✓ El rendimiento en producción sobre Vercel es estable a 60 FPS en pruebas móviles.
 ✓ Las misiones y sonidos responden de forma inmediata a los toques del jugador.
 ✓ El walkthrough.md y las especificaciones están actualizados con evidencias gráficas y de logs.
+
+---
+
+# 29. Engineering Philosophy
+
+Este documento actúa como contrato de alineación técnica y de diseño para Project Forge 2D.
+
+El objetivo de este proyecto no es únicamente construir una solución que funcione superficialmente, sino establecer un estándar de:
+*   **Correctitud**: Pruebas automatizadas continuas que garantizan el comportamiento físico y la estructura del proyecto.
+*   **Robustez**: Resistencia a fluctuaciones de FPS mediante actualizaciones de intervalo fijo (Fixed Update).
+*   **Escalabilidad**: Un plan de ruta técnico (Roadmap) que prevé la adopción de WebAssembly y WebGPU.
+*   **Mantenibilidad**: Código modular altamente cohesivo y de bajo acoplamiento que permite el desarrollo ágil distribuido.
+*   **Observabilidad**: Telemetría integrada para FPS, simulación física y dibujo en tiempo real.
+*   **Accesibilidad y UX**: Excelente respuesta táctil, consistencia de colores y adaptabilidad responsiva sin fricción para el usuario móvil.
