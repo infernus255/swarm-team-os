@@ -37,14 +37,14 @@ html, body { width: 100%; height: 100%; height: 100dvh; overflow: hidden; backgr
 .mat-label { position: absolute; bottom: -18px; left: 50%; transform: translateX(-50%); font-size: 8px; color: #888; white-space: nowrap; opacity: 0; transition: opacity 0.2s; pointer-events: none; }
 .mat-btn.sel .mat-label { opacity: 1; }
 #mp-toggle { position: relative; }
-#mp-panel { position: absolute; top: 100%; right: 0; margin-top: 8px; width: 280px; display: none; flex-direction: column; gap: 8px; padding: 14px; }
+#mp-panel { position: absolute; top: 100%; right: 0; margin-top: 8px; width: 280px; display: none; flex-direction: column; gap: 8px; padding: 14px; z-index: 100; }
 #mp-panel.show { display: flex; }
 #mp-panel h3 { margin: 0; font-size: 14px; color: var(--accent); }
 #mp-panel textarea { width: 100%; background: rgba(0,0,0,0.4); border: 1px solid var(--glass-border); color: #ccc; font-family: monospace; font-size: 10px; padding: 6px; border-radius: 6px; resize: none; }
 #mp-status { font-size: 11px; color: #8a8fb0; }
 .mp-row { display: flex; gap: 6px; }
 .mp-row .btn { flex: 1; font-size: 11px; padding: 7px 8px; min-height: 36px; }
-#tutorial { position: absolute; top: 18%; left: 50%; transform: translate(-50%,-18%); text-align: center; pointer-events: none; opacity: 1; transition: opacity 2s ease-out; text-shadow: 0 2px 12px rgba(0,0,0,0.9); }
+#tutorial { position: absolute; top: 18%; left: 50%; transform: translate(-50%,-18%); text-align: center; pointer-events: none; opacity: 1; transition: opacity 2s ease-out; text-shadow: 0 2px 12px rgba(0,0,0,0.9); z-index: 2; }
 #tutorial h1 { font-size: 26px; letter-spacing: 1px; background: linear-gradient(45deg, #ffd700, #ff6b35); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 6px; }
 #tutorial p { font-size: 13px; color: #bbb; }
 #respawn-flash { position: absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:5; opacity:0; background: radial-gradient(circle, rgba(255,100,100,0.4) 0%, transparent 70%); transition: opacity 0.05s; }
@@ -59,4 +59,7 @@ html, body { width: 100%; height: 100%; height: 100dvh; overflow: hidden; backgr
     #mission-panel { min-width: 120px; padding: 4px 8px; }
     #score-display { font-size: 11px; }
     #mission-display { font-size: 9px; }
+    .btn { min-height: 36px; min-width: 36px; padding: 6px 10px; font-size: 11px; }
+    #controls-top { flex-wrap: nowrap; }
+    #mp-panel { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); right: auto; margin-top: 0; width: 90%; max-width: 300px; box-shadow: 0 10px 40px rgba(0,0,0,0.7); background: rgba(10, 10, 20, 0.92); }
 }
