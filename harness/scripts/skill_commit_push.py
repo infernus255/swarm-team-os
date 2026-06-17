@@ -24,6 +24,7 @@ VALIDATION_FILES = [
     "README.md",
     "docs/HERMES_TELEGRAM_INSTALL_PLAN.md",
     "docs/copilot-instructions.md",
+    "docs/PES_FORGE_2D.md",
     "harness/README.md",
     "harness/docs/COPILOT_SKILL.md",
     "docs/N8N.md",

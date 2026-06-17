@@ -29,3 +29,6 @@ La capa L1 se alimenta automáticamente de fuentes externas de élite mediante e
 
 ### 2026-06-17T05:45:06.023222Z
 - Lecciones Aprendidas: 1. Render optimizado de autómatas celulares sin loops redundantes para celdas vacías (color=0). 2. Motores HTML5 autocontenidos sin CDNs externos. 3. Multijugador WebRTC P2P híbrido con pantalla dividida. 4. LCG PRNG para simulación física reproducible. 5. Despliegue estático en Vercel.
+
+### 2026-06-17T05:52:57.164450Z
+- Lecciones Aprendidas (Versión Audiencia Masiva): 1. Implementación de un bucle de juego basado en misiones procedimentales para incentivar la exploración y minado. 2. Incorporación de textos flotantes (FloatingText) para dar feedback visual inmediato ('juice'). 3. Sintetizador de música de fondo ambiental procedimental con Web Audio, optimizando la experiencia relajante del sandbox. 4. Redespliegue estático automatizado en Vercel con bypass de cache de Firecrawl mediante timestamps en la URL.
