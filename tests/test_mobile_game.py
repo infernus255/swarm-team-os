@@ -25,19 +25,18 @@ class TestMobileGame(unittest.TestCase):
         
         # Check for external CSS (href="..." where href contains http, https, or relative files)
         external_css = re.findall(r'<link\s+[^>]*rel=["\']stylesheet["\']\s+[^>]*href=["\']([^"\']+)["\']', content, re.IGNORECASE)
-        # Filter out local/inline style tags or unrelated links
         self.assertEqual(len(external_css), 0, f"Found external CSS references: {external_css}")
         
         # Check for remote CDNs or URLs anywhere in scripts/links
         remote_refs = re.findall(r'https?://[^\s"\'>]+', content)
-        # Allow W3C namespaces or schema declarations if any, but deny typical external JS/CSS dependencies
+        # Allow STUN server for WebRTC (required for P2P, not a CDN dependency)
         forbidden_cdns = ["cdnjs", "unpkg", "jsdelivr", "googleapis", "tailwind", "bootstrap", "jquery"]
         for ref in remote_refs:
             for cdn in forbidden_cdns:
                 self.assertNotIn(cdn, ref.lower(), f"Found potential remote dependency reference: {ref}")
 
     def test_html_structure(self):
-        """Verify that the index.html contains the necessary DOM elements for mobile HUD and Canvas."""
+        """Verify that the index.html contains the necessary DOM elements for the game HUD and Canvas."""
         if not INDEX_HTML_PATH.exists():
             self.skipTest("index.html not found")
             
@@ -45,9 +44,9 @@ class TestMobileGame(unittest.TestCase):
         
         required_elements = [
             'id="gameCanvas"',
-            'id="hud-container"',
-            'id="performance-monitor"',
-            'id="hotbar"',
+            'id="hud"',
+            'id="perf"',
+            'id="palette"',
             'id="btn-sound"',
             'id="btn-reset"'
         ]
@@ -65,20 +64,21 @@ class TestMobileGame(unittest.TestCase):
         
         required_signatures = [
             "class Noise2D",
-            "class SoundSynth",
-            "class World",
-            "class ParticleSystem",
+            "class Audio",
             "class Player",
             "class Camera",
             "class Game",
-            "BLOCK_SIZE",
-            "mulberry32",
-            "updateFluidPhysics",
-            "resolveCollisionsX",
-            "resolveCollisionsY",
-            "update(dt)",
-            "render()",
-            "requestAnimationFrame(gameLoop)"
+            "class Multiplayer",
+            "WORLD_W",
+            "WORLD_H",
+            "function simulate()",
+            "function explode(",
+            "function generateWorld()",
+            "simPowder(",
+            "simLiquid(",
+            "simGas(",
+            "simInteract(",
+            "requestAnimationFrame(loop)"
         ]
         
         for sig in required_signatures:
