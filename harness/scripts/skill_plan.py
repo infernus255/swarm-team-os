@@ -6,7 +6,7 @@ from datetime import datetime
 from utils.state_loader import StateLoader
 
 loader = StateLoader()
-REPO_ROOT = Path(__file__).resolve().parents[1]
+REPO_ROOT = Path(__file__).resolve().parents[2]
 PLAN_FILE = REPO_ROOT / "docs" / "HERMES_TELEGRAM_INSTALL_PLAN.md"
 
 STATE_BEGIN = "<!-- STATE-BEGIN -->"
