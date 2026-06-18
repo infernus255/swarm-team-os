@@ -10,7 +10,7 @@ from pathlib import Path
 from utils.state_loader import StateLoader
 
 loader = StateLoader()
-REPO_ROOT = Path(__file__).resolve().parents[1]
+REPO_ROOT = loader.repo_root
 VALIDATION_FILES = [
     "state.json",
     "memory.md",
@@ -22,13 +22,13 @@ VALIDATION_FILES = [
     "docs/N8N.md",
     "Dockerfile",
     "docker-compose.yml",
-    "docker-entrypoint.sh",
-    "hermes-install.sh",
+    "infra/hermes/docker-entrypoint.sh",
+    "infra/hermes/hermes-install.sh",
 ]
 
 
 def run(cmd, check=True, capture_output=True):
-    return subprocess.run(cmd, check=check, capture_output=capture_output, text=True)
+    return subprocess.run(cmd, check=check, capture_output=capture_output, text=True, encoding="utf-8", errors="replace")
 
 
 def validate_file(path):
@@ -102,13 +102,44 @@ def validate_copilot_docs():
 def validate_n8n():
     if not (REPO_ROOT / "docs" / "N8N.md").exists():
         return False, "Falta la documentación de n8n: docs/N8N.md"
-    if not shutil.which("n8n"):
-        return False, "n8n no está instalado o no está en el PATH"
-    if shutil.which("pgrep"):
-        proc = run(["pgrep", "-f", "n8n"], check=False)
-        if proc.returncode != 0:
-            return False, "n8n no parece estar levantado en el sistema"
-    return True, None
+    
+    # If running inside a container, check reachability of 'n8n' service
+    if os.path.exists("/.dockerenv") or os.path.exists("/run/.containerenv"):
+        import socket
+        try:
+            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            s.settimeout(2)
+            s.connect(("n8n", 5678))
+            s.close()
+            return True, None
+        except Exception as exc:
+            return False, f"n8n no es accesible en la red del contenedor: {exc}"
+
+    # Check if n8n is running locally or in Docker
+    local_n8n = shutil.which("n8n")
+    if local_n8n:
+        if shutil.which("pgrep"):
+            proc = run(["pgrep", "-f", "n8n"], check=False)
+            if proc.returncode != 0:
+                return False, "n8n no parece estar levantado en el sistema local"
+        return True, None
+        
+    # If not local, check if running in docker
+    if shutil.which("docker"):
+        try:
+            # Check if n8n service is running or configured in docker compose
+            config_proc = run(["docker", "compose", "config", "--services"], check=False)
+            if config_proc.returncode == 0 and "n8n" in config_proc.stdout.splitlines():
+                ps_proc = run(["docker", "compose", "ps"], check=False)
+                if ps_proc.returncode == 0 and "n8n" in ps_proc.stdout.lower():
+                    # Check if status indicates it is up/running
+                    if any(status in ps_proc.stdout.lower() for status in ["up", "running", "running (healthy)"]):
+                        return True, None
+                return False, "n8n está configurado en docker-compose, pero el contenedor no está iniciado (ejecuta docker compose up -d)"
+        except Exception as exc:
+            return False, f"Error al verificar n8n en Docker: {exc}"
+            
+    return False, "n8n no está instalado en el PATH local ni corriendo en Docker"
 
 
 def validate_api_keys(state):
@@ -127,6 +158,13 @@ def validate_docker():
     dockerfile = REPO_ROOT / "Dockerfile"
     if not dockerfile.exists():
         return False, "Falta Dockerfile"
+    
+    # If running inside a container, skip docker binary/daemon verification
+    if os.path.exists("/.dockerenv") or os.path.exists("/run/.containerenv"):
+        if not (REPO_ROOT / "docker-compose.yml").exists():
+            return False, "Falta docker-compose.yml"
+        return True, None
+
     if not shutil.which("docker"):
         return False, "docker no está instalado en el PATH"
     try:
