@@ -33,6 +33,7 @@ class Settings:
         self.node_id = os.getenv("NODE_ID") or platform.node() or "unknown_node"
         self.node_token = os.getenv("NODE_TOKEN", "default_secret_node_token")
         self.env_tier = os.getenv("ENV_TIER", "DEV")
+        self.ntfy_topic = os.getenv("NTFY_TOPIC") or "jarvis_os"
         self.version = self._get_version()
 
         # AI Model Tiers (FinOps Cascading - 2026 Standards)

@@ -66,7 +66,46 @@ class JarvisAssistant:
         result["diagnostics"] = diagnostics
 
         await self._learn(prompt, result)
+        self._send_notification(prompt, result)
         return result
+
+    def _send_notification(self, prompt: str, result: dict):
+        """Sends an executive summary notification via ntfy.sh."""
+        import requests
+        print("[Notification] [Jarvis] Preparing execution summary...")
+        
+        status = result.get("status", "UNKNOWN")
+        details = result.get("details", "")
+        if not details and "poly_swarm_results" in result:
+            details = "Poly-Swarm coordinated task finished successfully."
+        
+        # 1. Generate executive summary (2-3 lines)
+        msg_lines = [
+            f"🚀 Jarvis Run: {prompt[:40]}...",
+            f"📌 Status: {'🟢 SUCCESS' if status == 'SUCCESS' else '🔴 ERROR'}"
+        ]
+        
+        # 2. Include error code/reason if failed
+        if status != "SUCCESS":
+            errors = result.get("errors_encountered") or []
+            err_msg = result.get("details") or "No details provided."
+            if errors:
+                err_msg = f"{errors[0].get('node', 'unknown')}: {errors[0].get('error', 'unknown error')}"
+            msg_lines.append(f"⚠️ Error: {err_msg[:60]}")
+        else:
+            msg_lines.append(f"📝 Result: {str(details)[:60]}")
+            
+        message = "\n".join(msg_lines)
+        
+        try:
+            url = f"https://ntfy.sh/{settings.ntfy_topic}"
+            response = requests.post(url, data=message.encode("utf-8"), headers={"Title": "Jarvis OS Notification"}, timeout=5)
+            if response.status_code == 200:
+                print(f"[Notification] [Jarvis] Successfully notified via ntfy.sh/{settings.ntfy_topic}")
+            else:
+                print(f"[!] [Jarvis] Notification failed with status {response.status_code}")
+        except Exception as e:
+            print(f"[!] [Jarvis] Notification request failed: {e}")
 
     def _run_agnostic_audits(self) -> dict:
         """Agnostic audit feature: checks local/offline network loops & memory optimization alerts."""
