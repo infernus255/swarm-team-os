@@ -18,12 +18,7 @@ from utils.state_loader import StateLoader
 
 loader = StateLoader()
 REPO_ROOT = loader.repo_root
-PLAN_FILE = REPO_ROOT / "docs" / "HERMES_TELEGRAM_INSTALL_PLAN.md"
-
-STATE_BEGIN = "<!-- STATE-BEGIN -->"
-STATE_END = "<!-- STATE-END -->"
-AUTORUNNER_BEGIN = "<!-- AUTORUNNER-BEGIN -->"
-AUTORUNNER_END = "<!-- AUTORUNNER-END -->"
+PLAN_FILE = REPO_ROOT / "docs" / "state_summary.md"
 
 
 def load_state():
@@ -123,20 +118,14 @@ def format_autorunner(state):
 
 
 def update_plan_file(state):
-    if not PLAN_FILE.exists():
-        print(f"[WARNING] Plan file not found: {PLAN_FILE}. Skipping plan update.")
-        return
-    content = PLAN_FILE.read_text(encoding="utf-8")
     state_section = format_state(state)
     autorunner_section = format_autorunner(state)
-    if STATE_BEGIN in content and STATE_END in content:
-        content = content.split(STATE_BEGIN)[0] + STATE_BEGIN + "\n" + state_section + STATE_END + content.split(STATE_END)[1]
-    else:
-        content = content.rstrip() + "\n\n" + STATE_BEGIN + "\n" + state_section + STATE_END + "\n\n"
-    if AUTORUNNER_BEGIN in content and AUTORUNNER_END in content:
-        content = content.split(AUTORUNNER_BEGIN)[0] + AUTORUNNER_BEGIN + "\n" + autorunner_section + AUTORUNNER_END + content.split(AUTORUNNER_END)[1]
-    else:
-        content = content.rstrip() + "\n\n" + AUTORUNNER_BEGIN + "\n" + autorunner_section + AUTORUNNER_END + "\n"
+    
+    content = f"# Environment State Summary\n\n{state_section}\n\n{autorunner_section}"
+    
+    # Ensure docs directory exists
+    PLAN_FILE.parent.mkdir(parents=True, exist_ok=True)
+    
     PLAN_FILE.write_text(content, encoding="utf-8")
     print(f"Plan actualizado en {PLAN_FILE}")
 

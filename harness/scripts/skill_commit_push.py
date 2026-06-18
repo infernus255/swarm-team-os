@@ -80,19 +80,18 @@ def validate_hermes(state):
     return True, None
 
 
-def validate_copilot_docs():
+def validate_agent_docs():
     docs = [
-        ("docs/copilot-instructions.md", ["Use only the provided scripts", "skill_state.py", "skill_plan.py", "skill_docker.py"]),
-        ("harness/docs/COPILOT_SKILL.md", ["deterministic", "state.json", "skill_memory.sh", "skill_state.py", "skill_docker.py"]),
+        (".agents/AGENTS.md", ["Universal AI bootstrap", "skill_state.py", "skill_plan.py", "skill_commit_push.py"]),
     ]
     for path, phrases in docs:
         file_path = REPO_ROOT / path
         if not file_path.exists():
-            return False, f"Falta la documentación de Copilot: {path}"
+            return False, f"Falta el bootstrap AI universal: {path}"
         content = file_path.read_text(encoding="utf-8")
         for phrase in phrases:
             if phrase not in content:
-                return False, f"El archivo {path} no menciona '{phrase}', debe incluir reglas de uso deterministas"
+                return False, f"El archivo {path} no menciona '{phrase}'"
     return True, None
 
 
@@ -213,7 +212,7 @@ def main():
             for validator, label in [
                 (lambda: validate_os(state), "OS"),
                 (lambda: validate_hermes(state), "Hermes"),
-                (lambda: validate_copilot_docs(), "Copilot docs"),
+                (lambda: validate_agent_docs(), "Agent docs"),
                 (lambda: validate_api_keys(state), "API keys"),
                 (lambda: validate_n8n(), "n8n"),
                 (lambda: validate_docker(), "Docker"),

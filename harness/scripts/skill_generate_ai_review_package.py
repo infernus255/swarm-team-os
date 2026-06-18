@@ -12,12 +12,8 @@ OUTPUT_FILE = REPO_ROOT / "review_for_ai.md"
 REVIEW_FILES = [
     ".agents/AGENTS.md",
     "README.md",
-    "MASTER_HANDOFF.md",
-    "NEXT_HANDOFF.md",
     "repo_map.md",
-    "docs/copilot-instructions.md",
     "harness/README.md",
-    "harness/docs/COPILOT_SKILL.md",
     "harness/scripts/skill_state.py",
     "harness/scripts/skill_plan.py",
     "harness/scripts/skill_docker.py",
