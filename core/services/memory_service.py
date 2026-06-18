@@ -86,8 +86,8 @@ class MemoryService:
             print(f"[MemoryService] Push error: {e}", file=sys.stderr)
             return False
 
-    def query_memory(self, query: str, limit: int = 5) -> str:
-        """Queries for local project context (L0/L1)."""
+    def query_memory(self, query: str, project_id: Optional[str] = None, limit: int = 5) -> str:
+        """Queries for local project context (L0/L1) with optional project_id filtering."""
         try:
             conn = self._get_connection()
             with conn.cursor() as cur:
@@ -98,13 +98,15 @@ class MemoryService:
                 if embedding:
                     cur.execute("""
                         SELECT content FROM sga_l1_swarm_knowledge 
-                        WHERE env_tier = %s ORDER BY embedding <=> %s::vector LIMIT %s;
-                    """, (settings.env_tier, embedding, limit))
+                        WHERE env_tier = %s AND (project_id = %s OR %s IS NULL)
+                        ORDER BY embedding <=> %s::vector LIMIT %s;
+                    """, (settings.env_tier, project_id, project_id, embedding, limit))
                 else:
                     cur.execute("""
                         SELECT content FROM sga_l0_context 
-                        WHERE env_tier = %s AND content ILIKE %s ORDER BY created_at DESC LIMIT %s;
-                    """, (settings.env_tier, f"%{query}%", limit))
+                        WHERE env_tier = %s AND (project_id = %s OR %s IS NULL) AND content ILIKE %s 
+                        ORDER BY created_at DESC LIMIT %s;
+                    """, (settings.env_tier, project_id, project_id, f"%{query}%", limit))
                 
                 rows = cur.fetchall()
                 return "\n\n".join([r[0] for r in rows]) if rows else "No memories found."
@@ -112,8 +114,8 @@ class MemoryService:
             print(f"[MemoryService] Query error: {e}", file=sys.stderr)
             return "Error querying memory."
 
-    def query_global_memory(self, query: str, limit: int = 10) -> str:
-        """Queries for global cross-project knowledge (L1)."""
+    def query_global_memory(self, query: str, domain: Optional[str] = None, limit: int = 10) -> str:
+        """Queries for global cross-project knowledge (L1) with optional domain filtering."""
         try:
             conn = self._get_connection()
             with conn.cursor() as cur:
@@ -124,13 +126,15 @@ class MemoryService:
                 if embedding:
                     cur.execute("""
                         SELECT content FROM sga_l1_swarm_knowledge 
+                        WHERE (metadata->>'domain' = %s OR %s IS NULL)
                         ORDER BY embedding <=> %s::vector LIMIT %s;
-                    """, (embedding, limit))
+                    """, (domain, domain, embedding, limit))
                 else:
                     cur.execute("""
                         SELECT content FROM sga_l0_context 
-                        WHERE content ILIKE %s ORDER BY created_at DESC LIMIT %s;
-                    """, (f"%{query}%", limit))
+                        WHERE (metadata->>'domain' = %s OR %s IS NULL) AND content ILIKE %s 
+                        ORDER BY created_at DESC LIMIT %s;
+                    """, (domain, domain, f"%{query}%", limit))
                 
                 rows = cur.fetchall()
                 return "\n\n---\n\n".join([r[0] for r in rows]) if rows else "No global memory context available."
