@@ -16,69 +16,54 @@ class EngineSelector:
         self.repo_root = repo_root or Path.cwd()
         self.engines_dir = self.repo_root / "swarm" / "engines"
 
-    async def select_engine(self, prompt: str) -> str:
+    async def select_engine(self, prompt: str) -> Dict[str, Any]:
         """Selects engine folder name based on intelligent classification."""
         print("🧠 [Engine Selector]: Classifying task with Tier 1 LLM...")
         classification = await llm_provider.classify_task(prompt)
         
-        engine_name = classification.get("selected_engine")
-        reason = classification.get("reason", "No reason provided.")
-        complexity = classification.get("complexity", "medium")
-        tech_stack = classification.get("detected_tech_stack", [])
-        
-        print(f"🎯 [Engine Selector]: Selected {engine_name} (Complexity: {complexity})")
-        print(f"🛠️ [Engine Selector]: Tech Stack: {', '.join(tech_stack) if tech_stack else 'Not detected'}")
-        print(f"📝 [Engine Selector]: Reason: {reason}")
-
         # Validation: check if the folder exists
-        if engine_name and (self.engines_dir / engine_name).exists():
-            return engine_name
+        engine_name = classification.get("selected_engine")
+        if not engine_name or not (self.engines_dir / engine_name).exists():
+            print(f"⚠️ [Engine Selector]: Suggested engine '{engine_name}' not found. Using fallback.")
+            engine_name = self._keyword_fallback(prompt)
+            classification["selected_engine"] = engine_name
 
-        # Fallback to keyword matching if LLM failed or suggested non-existent engine
-        print("⚠️ [Engine Selector]: Intelligent classification failed or engine not found. Falling back to keyword matching.")
-        prompt_lower = prompt.lower()
-        if any(k in prompt_lower for k in ["antigravity", "gemini sdk", "google sdk", "google-antigravity"]):
-            return ".swarm_antigravity_sdk"
-        elif any(k in prompt_lower for k in ["fastapi", "pydantic", "pydanticai", "pydantic-ai"]):
-            return ".swarm_pydantic_fast"
-        elif any(k in prompt_lower for k in ["copilot", "github copilot", "vs code", "vscode"]):
-            return ".swarm_copilot"
+        classification["reason"] = classification.get("reason", "Fallback selection.")
+        classification["complexity"] = classification.get("complexity", "medium")
         
-        # HITL Fallback Selection
-        if sys.stdin.isatty():
-            print("\n🤖 [Engine Selector] No clear engine match found in prompt.")
-            print("Please select an engine from the list below:")
-            print("1. Google Antigravity SDK Swarm (.swarm_antigravity_sdk) [Default]")
-            print("2. FastAPI + PydanticAI Swarm (.swarm_pydantic_fast)")
-            print("3. VS Code Copilot Instructions (.swarm_copilot)")
-            print("4. Baseline Swarm Template (.swarm_template)")
-            
-            try:
-                choice = input("Enter selection (1-4, default 1): ").strip()
-            except Exception:
-                choice = "1"
-                
-            if choice == "2":
-                return ".swarm_pydantic_fast"
-            elif choice == "3":
-                return ".swarm_copilot"
-            elif choice == "4":
-                return ".swarm_template"
-            else:
-                return ".swarm_antigravity_sdk"
-        else:
-            print("\n🤖 [Engine Selector] Non-interactive session, defaulting to Google Antigravity SDK Swarm (.swarm_antigravity_sdk)")
-            return ".swarm_antigravity_sdk"
+        print(f"Targeting engine: {engine_name} (Complexity: {classification['complexity']})")
+        return classification
 
-    async def execute_engine(self, engine_name: str, prompt: str) -> Dict[str, Any]:
+    def _keyword_fallback(self, prompt: str) -> str:
+        prompt_lower = prompt.lower()
+        if any(k in prompt_lower for k in ["antigravity", "gemini sdk", "google sdk"]):
+            return ".swarm_antigravity_sdk"
+        elif any(k in prompt_lower for k in ["fastapi", "pydantic", "pydanticai"]):
+            return ".swarm_pydantic_fast"
+        elif any(k in prompt_lower for k in ["copilot", "github copilot"]):
+            return ".swarm_copilot"
+        return ".swarm_antigravity_sdk"
+
+    async def execute_engine(self, classification: Dict[str, Any], prompt: str) -> Dict[str, Any]:
         """Executes the selected engine subprocess, passing application_requirement_prompt.md."""
+        engine_name = classification["selected_engine"]
         engine_path = self.engines_dir / engine_name
         
-        # 1. Write the application requirement prompt in app_result
+        # 1. Write the application requirement prompt
         requirement_file = self.repo_root / "app_result" / "application_requirement_prompt.md"
         requirement_file.parent.mkdir(parents=True, exist_ok=True)
-        requirement_file.write_text(f"# Application Requirement\n\n{prompt}\n", encoding="utf-8")
-        print(f"[*] Prompt written to {requirement_file.relative_to(self.repo_root)}")
+        
+        req_content = f"# Application Requirement\n\n{prompt}\n\n"
+        req_content += f"## Meta-Data\n- **Complexity**: {classification.get('complexity')}\n"
+        req_content += f"- **Tech Stack**: {', '.join(classification.get('detected_tech_stack', []))}\n"
+        req_content += f"- **Reasoning**: {classification.get('reason')}\n"
+        
+        requirement_file.write_text(req_content, encoding="utf-8")
+
+        # ... (rest of environment setup)
+        env = os.environ.copy()
+        env["SWARM_COMPLEXITY"] = classification.get("complexity", "medium")
+        env["SWARM_TECH_STACK"] = ",".join(classification.get("detected_tech_stack", []))
 
         # 2. Check if .swarm_copilot is selected
         if engine_name == ".swarm_copilot":

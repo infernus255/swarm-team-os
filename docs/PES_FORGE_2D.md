@@ -1,4 +1,4 @@
-# Product & Engineering Specification: Project Forge 2D (PES 1.4)
+# Product & Engineering Specification: Project Forge 2D (PES 1.5)
 
 ---
 
@@ -7,7 +7,7 @@
 | Campo                  | Valor                                                     |
 | ---------------------- | --------------------------------------------------------- |
 | Producto / Feature     | Project Forge 2D (Noita-style Sandbox Game)               |
-| Versión                | 1.4.0                                                     |
+| Versión                | 1.5.0                                                     |
 | Estado                 | Approved                                                  |
 | Product Owner          | User                                                      |
 | Tech Lead              | Antigravity (Advanced Agentic Coding)                     |
@@ -292,6 +292,7 @@ Para **revelar los secretos de la antigua civilización cibernética y ganar la 
 * **Disparo Ácido (Acid)**: Proyectil corrosivo que disuelve baldosas sólidas (excepto BEDROCK) en un radio de 4 celdas al impactar.
 * **Disparo Gélido (Ice)**: Proyectil congelante que ralentiza a los enemigos (`slowTimer = 180` frames) y transforma agua y petróleo en bloques de hielo (`MAT.ICE`).
 * **Disparo de Plasma (Lava)**: Inflige `25` de daño base (en lugar de 10) y funde roca (`MAT.STONE`) transformándola en lava líquida (`MAT.LAVA`).
+* **Disparo Eléctrico (Electricity)**: Proyectil de alta velocidad que inflige `18` de daño y genera partículas de `MAT.ELECTRICITY` al impactar, las cuales conducen a través de `MAT.WATER` y `MAT.METAL`.
 
 ---
 

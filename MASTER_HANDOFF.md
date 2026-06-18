@@ -1,4 +1,4 @@
-# 🤖 SWARMTEAM OS: MASTER ARCHITECTURE & HANDOFF (v3.0 Elite)
+# 🤖 SWARMTEAM OS: MASTER ARCHITECTURE & HANDOFF (v3.1 Elite)
 
 > **META-INSTRUCTION:** Este es el "Source of Truth" definitivo. Ningún agente debe operar fuera de estos parámetros. El sistema es un **OS Agentic Distribuido** diseñado para la máxima eficiencia de tokens y precisión de ingeniería.
 
@@ -7,9 +7,9 @@
 ## 🏛️ 1. FILOSOFÍA: AGENTIC ENGINEERING & SDD
 SwarmTeam OS opera bajo el paradigma de **Spec-Driven Development (SDD)**. El código es un artefacto secundario; la especificación y la arquitectura son primarias.
 - **Hermes (The Runtime):** El framework de agente subyacente instalado en la máquina. Recibe disparadores (CLI, Telegram, Webhook) y ejecuta el Repo.
-- **Jarvis (The Intelligence/Dispatcher):** El script `jarvis.py`. Actúa como el cerebro local. **Múltiples instancias de Jarvis pueden correr simultáneamente en diferentes nodos** (ej. una en Oracle manejando Telegram, otra en el Pentium manejando tareas locales). Se sincronizan vía SGA y Git.
-- **Poly-Swarm (The Workforce):** Motores especializados en `swarm/engines/` (Copilot, Antigravity, PydanticAI) invocados por Jarvis para tareas específicas.
-- **Harness Engineering:** Uso de skills deterministas para interactuar con el mundo físico.
+- **Jarvis (The Intelligence/Dispatcher):** El script `jarvis.py`. Actúa como el cerebro local. Se coordina a través del `PolySwarmCoordinator` para despachar tareas a múltiples motores.
+- **Poly-Swarm (The Workforce):** Motores especializados en `swarm/engines/` (Copilot, Antigravity, PydanticAI). Ahora, el OS puede orquestar tareas complejas dividiéndolas o despachándolas dinámicamente mediante el **Engine Selector v2** impulsado por clasificación de LLM (Tier 1).
+- **Harness Engineering:** Uso de skills deterministas y dashboards de observabilidad en vivo SQL (Neon DB).
 
 ---
 
@@ -21,7 +21,7 @@ El sistema se adapta a su entorno vía `env_drivers/`. Cada dispositivo tiene ro
    - **Capabilities:** Telegram webhook siempre online, orquestador de swarms pesados en la nube. El "Public Jarvis" primario.
 2. **Pentium (The Anchor / Local Mayordomo):**
    - **Specs:** PC local de bajos recursos, 120GB SSD, Ubuntu Server.
-   - **Capabilities:** Host de la base de datos SGA (PostgreSQL+pgvector). Ejecuta el OCI Hunter (`cazador.py`). Gestiona el gateway/firewall local.
+   - **Capabilities:** Host y gestor local de bases de datos. Ejecuta el OCI Hunter (`cazador.py`). Gestiona el gateway/firewall local.
 3. **Ryzen Desktop (The Muscle / Battle Station):**
    - **Specs:** Ryzen 3600X, RX 5600XT (6GB VRAM), 16GB RAM, Windows 11.
    - **Capabilities:** Computación pesada vía Docker (invisible para gaming). Inferencia de LLM local, compilación pesada y generación de medios.
@@ -35,13 +35,12 @@ El sistema se adapta a su entorno vía `env_drivers/`. Cada dispositivo tiene ro
 
 ---
 
-## 🧠 3. SISTEMA DE MEMORIA SGA (DUAL-LAYER)
-La memoria es el pegamento del sistema distribuido, alojada en **Neon PostgreSQL + pgvector**.
+## 🧠 3. SISTEMA DE MEMORIA SGA (DUAL-LAYER + DOMAINS)
+La memoria es el pegamento del sistema distribuido, alojada en **Neon PostgreSQL + pgvector**. Se aplican **Domain Tags** (`game`, `swarm`, `harness`, `system`) para evitar la contaminación cruzada de contextos.
 - **L0 (Jarvis OS Meta-State):** 
-  - Almacena el estado de los nodos, contexto conversacional y preferencias del usuario.
-  - Trazabilidad de fases en `core/orchestrator.py`.
+  - Almacena el estado de los nodos, contexto conversacional y progreso de proyectos.
 - **L1 (Autonomous Swarm Knowledge):**
-  - Conocimiento técnico atomizado (coding paradigms, bug resolutions).
+  - Conocimiento técnico atomizado. Los agentes del Swarm (ej. M0 Bootstrapper) tienen acceso a herramientas como `query_sga` para consultar este conocimiento global en tiempo real.
   - **Guru-Watch Insights:** Novedades de la industria inyectadas automáticamente.
 
 ---
@@ -70,4 +69,4 @@ El sistema nunca queda obsoleto gracias al **Guru-Watch Protocol**:
 4. **Self-Update:** Antes de cada ciclo, Jarvis hace un `git pull` para sincronizar cambios realizados por otros nodos o agentes.
 
 ---
-**¡SwarmTeam OS Elite v3.0 está en línea!**
+**¡SwarmTeam OS Elite v3.1 está en línea!**

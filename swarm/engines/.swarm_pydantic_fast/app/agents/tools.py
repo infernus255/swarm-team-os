@@ -7,6 +7,12 @@ from app.config import settings
 from app.engine.validator import validator as contract_validator
 
 
+from app.engine.memory import memory
+
+async def query_sga(query: str, limit: int = 5) -> str:
+    """Consulta la memoria global del enjambre (SGA) para obtener insights tecnicos."""
+    return memory.query_global(query, limit)
+
 async def read_file(path: str) -> str:
     full = _resolve(path)
     if not full.exists():

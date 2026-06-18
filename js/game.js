@@ -626,6 +626,11 @@ class Projectile {
             if (pi >= 0 && grid[pi] === MAT.EMPTY && rng() < 0.35) {
                 setCell(pi, MAT.FIRE);
             }
+        } else if (this.type === 'electric') {
+            const pi = idx(this.x | 0, this.y | 0);
+            if (pi >= 0 && (grid[pi] === MAT.EMPTY || grid[pi] === MAT.WATER || grid[pi] === MAT.METAL) && rng() < 0.4) {
+                setCell(pi, MAT.ELECTRICITY);
+            }
         }
 
         if (this.isSolid(this.x, this.y)) {
@@ -664,6 +669,7 @@ class Projectile {
                 if (dist < hitDist) {
                     let dmg = 10;
                     if (this.type === 'plasma') dmg = 25;
+                    else if (this.type === 'electric') dmg = 18;
                     e.hp -= dmg;
                     if (this.type === 'ice') {
                         e.slowTimer = 180;
@@ -729,6 +735,16 @@ class Projectile {
                     }
                 }
             }
+        } else if (this.type === 'electric') {
+            for (let dy = -4; dy <= 4; dy++) {
+                for (let dx = -4; dx <= 4; dx++) {
+                    const ti = idx(tx+dx, ty+dy);
+                    if (ti >= 0 && (grid[ti] === MAT.EMPTY || grid[ti] === MAT.WATER || grid[ti] === MAT.METAL) && rng() < 0.6) {
+                        setCell(ti, MAT.ELECTRICITY);
+                    }
+                }
+            }
+            explode(tx, ty, 3);
         } else {
             explode(tx, ty, 4 + (rng() * 3 | 0));
         }
@@ -755,6 +771,18 @@ class Projectile {
             ctx.beginPath();
             ctx.arc(sx + sw/2 - 1, sy + sh/2 - 1, sw/4, 0, Math.PI*2);
             ctx.fill();
+        } else if (this.type === 'electric') {
+            ctx.shadowColor = '#64c8ff';
+            ctx.shadowBlur = 12;
+            ctx.fillStyle = '#fff';
+            ctx.beginPath();
+            ctx.arc(sx + sw/2, sy + sh/2, sw/2, 0, Math.PI*2);
+            ctx.fill();
+            // Little sparks around
+            ctx.fillStyle = '#64c8ff';
+            for(let i=0; i<3; i++) {
+                ctx.fillRect(sx + (rng()-0.5)*12, sy + (rng()-0.5)*12, 2, 2);
+            }
         } else if (this.type === 'turret_shot') {
             ctx.shadowColor = '#ff007f';
             ctx.shadowBlur = 8;
@@ -2098,11 +2126,13 @@ class Game {
                 if (this.currentMat === MAT.ACID) projType = 'acid';
                 else if (this.currentMat === MAT.ICE) projType = 'ice';
                 else if (this.currentMat === MAT.LAVA) projType = 'plasma';
+                else if (this.currentMat === MAT.ELECTRICITY) projType = 'electric';
                 else if (this.currentMat === MAT.FIRE) projType = 'fire';
                 else {
                     if (p.selectedMat === MAT.ACID) projType = 'acid';
                     else if (p.selectedMat === MAT.ICE) projType = 'ice';
                     else if (p.selectedMat === MAT.LAVA) projType = 'plasma';
+                    else if (p.selectedMat === MAT.ELECTRICITY) projType = 'electric';
                 }
                 this.projectiles.push(new Projectile(pcx, pcy - 4, wx, wy, projType));
                 this.audio.playShoot();

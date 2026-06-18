@@ -5,7 +5,12 @@ from pydantic_ai import Agent, RunContext
 from app.config import settings
 from app.models.results import M0Manifest
 from app.models.state import SwarmState
-from app.agents.tools import read_file, read_template, write_file
+from app.agents.tools import read_file, read_template, write_file, query_sga
+...
+@m0_agent.tool_plain
+async def search_swarm_knowledge(query: str) -> str:
+    """Busca en la memoria global del enjambre para encontrar patrones de exito en proyectos previos."""
+    return await query_sga(query)
 
 m0_agent = Agent(
     model=settings.model_for("M0"),

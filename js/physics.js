@@ -17,36 +17,39 @@ const INTERACTION_RANGE = 40;
 const MAT = {
     EMPTY:0, SAND:1, WATER:2, STONE:3, WOOD:4, FIRE:5, LAVA:6,
     STEAM:7, OIL:8, ACID:9, GUNPOWDER:10, SMOKE:11, DIRT:12,
-    GRASS:13, GLASS:14, ICE:15, EMBER:16, BEDROCK:17
+    GRASS:13, GLASS:14, ICE:15, EMBER:16, BEDROCK:17,
+    METAL:18, ELECTRICITY:19
 };
 const PROPS = [];
-// type: 0=empty, 1=solid, 2=powder, 3=liquid, 4=gas
-PROPS[MAT.EMPTY]     = { n:'Vacio',    t:0, d:0,   fl:0, ar:1 };
-PROPS[MAT.SAND]      = { n:'Arena',    t:2, d:5,   fl:0, ar:0 };
-PROPS[MAT.WATER]     = { n:'Agua',     t:3, d:3,   fl:0, ar:1 };
-PROPS[MAT.STONE]     = { n:'Piedra',   t:1, d:10,  fl:0, ar:0 };
-PROPS[MAT.WOOD]      = { n:'Madera',   t:1, d:8,   fl:1, ar:0 };
-PROPS[MAT.FIRE]      = { n:'Fuego',    t:4, d:-2,  fl:0, ar:1 };
-PROPS[MAT.LAVA]      = { n:'Lava',     t:3, d:7,   fl:0, ar:1 };
-PROPS[MAT.STEAM]     = { n:'Vapor',    t:4, d:-1,  fl:0, ar:1 };
-PROPS[MAT.OIL]       = { n:'Petroleo', t:3, d:2,   fl:1, ar:0 };
-PROPS[MAT.ACID]      = { n:'Acido',    t:3, d:3.5, fl:0, ar:1 };
-PROPS[MAT.GUNPOWDER] = { n:'Polvora',  t:2, d:4,   fl:1, ar:0 };
-PROPS[MAT.SMOKE]     = { n:'Humo',     t:4, d:-1,  fl:0, ar:1 };
-PROPS[MAT.DIRT]      = { n:'Tierra',   t:1, d:7,   fl:0, ar:0 };
-PROPS[MAT.GRASS]     = { n:'Hierba',   t:1, d:7,   fl:1, ar:0 };
-PROPS[MAT.GLASS]     = { n:'Cristal',  t:1, d:9,   fl:0, ar:1 };
-PROPS[MAT.ICE]       = { n:'Hielo',    t:1, d:3,   fl:0, ar:1 };
-PROPS[MAT.EMBER]     = { n:'Brasa',    t:2, d:2,   fl:0, ar:1 };
-PROPS[MAT.BEDROCK]   = { n:'Roca',     t:1, d:99,  fl:0, ar:1 };
+// type: 0=empty, 1=solid, 2=powder, 3=liquid, 4=gas, 5=special
+PROPS[MAT.EMPTY]       = { n:'Vacio',    t:0, d:0,   fl:0, ar:1 };
+PROPS[MAT.SAND]        = { n:'Arena',    t:2, d:5,   fl:0, ar:0 };
+PROPS[MAT.WATER]       = { n:'Agua',     t:3, d:3,   fl:0, ar:1 };
+PROPS[MAT.STONE]       = { n:'Piedra',   t:1, d:10,  fl:0, ar:0 };
+PROPS[MAT.WOOD]        = { n:'Madera',   t:1, d:8,   fl:1, ar:0 };
+PROPS[MAT.FIRE]        = { n:'Fuego',    t:5, d:-2,  fl:0, ar:1 };
+PROPS[MAT.LAVA]        = { n:'Lava',     t:3, d:7,   fl:0, ar:1 };
+PROPS[MAT.STEAM]       = { n:'Vapor',    t:4, d:-1,  fl:0, ar:1 };
+PROPS[MAT.OIL]         = { n:'Petroleo', t:3, d:2,   fl:1, ar:0 };
+PROPS[MAT.ACID]        = { n:'Acido',    t:3, d:3.5, fl:0, ar:1 };
+PROPS[MAT.GUNPOWDER]   = { n:'Polvora',  t:2, d:4,   fl:1, ar:0 };
+PROPS[MAT.SMOKE]       = { n:'Humo',     t:4, d:-1,  fl:0, ar:1 };
+PROPS[MAT.DIRT]        = { n:'Tierra',   t:2, d:7,   fl:0, ar:0 };
+PROPS[MAT.GRASS]       = { n:'Hierba',   t:2, d:7,   fl:1, ar:0 };
+PROPS[MAT.GLASS]       = { n:'Cristal',  t:1, d:9,   fl:0, ar:1 };
+PROPS[MAT.ICE]         = { n:'Hielo',    t:1, d:3,   fl:0, ar:1 };
+PROPS[MAT.EMBER]       = { n:'Brasa',    t:2, d:2,   fl:0, ar:1 };
+PROPS[MAT.BEDROCK]     = { n:'Roca',     t:1, d:99,  fl:0, ar:1 };
+PROPS[MAT.METAL]       = { n:'Metal',    t:1, d:15,  fl:0, ar:1 };
+PROPS[MAT.ELECTRICITY] = { n:'Rayo',     t:5, d:0,   fl:0, ar:1 };
 
 // High-Performance Flat TypedArrays for hot simulation loops
-const PROP_TYPE = new Uint8Array(18);
-const PROP_DENSITY = new Float32Array(18);
-const PROP_FLAMMABLE = new Uint8Array(18);
-const PROP_ACID_RESIST = new Uint8Array(18);
+const PROP_TYPE = new Uint8Array(20);
+const PROP_DENSITY = new Float32Array(20);
+const PROP_FLAMMABLE = new Uint8Array(20);
+const PROP_ACID_RESIST = new Uint8Array(20);
 const PROP_NAME = [];
-for (let m = 0; m < 18; m++) {
+for (let m = 0; m < 20; m++) {
     const p = PROPS[m];
     if (p) {
         PROP_TYPE[m] = p.t;
@@ -58,7 +61,7 @@ for (let m = 0; m < 18; m++) {
 }
 
 // Palette materials player can place
-const PALETTE = [MAT.SAND, MAT.WATER, MAT.STONE, MAT.WOOD, MAT.FIRE, MAT.OIL, MAT.GUNPOWDER, MAT.LAVA, MAT.ACID, MAT.DIRT, MAT.GLASS, MAT.ICE, MAT.EMBER];
+const PALETTE = [MAT.SAND, MAT.WATER, MAT.STONE, MAT.WOOD, MAT.FIRE, MAT.OIL, MAT.GUNPOWDER, MAT.LAVA, MAT.ACID, MAT.DIRT, MAT.GLASS, MAT.ICE, MAT.EMBER, MAT.METAL];
 const TOOL_PLACE = 0, TOOL_MINE = 1, TOOL_BOMB = 2, TOOL_STAFF = 3;
 const TOOL_ICONS = ['🖌️','⛏️','💣','🔥'];
 
@@ -84,6 +87,8 @@ function matColor(m) {
         case MAT.ICE:       return packC(180+v, 210+v, 240, 200);
         case MAT.EMBER:     return packC(200+v, 100+(rng()*40|0), 20, 200);
         case MAT.BEDROCK:   return packC(30+v, 30+v, 35+v, 255);
+        case MAT.METAL:     return packC(160+v, 160+v, 175+v, 255);
+        case MAT.ELECTRICITY: return packC(100+v, 200+v, 255, 255);
         default:            return 0;
     }
 }
@@ -96,7 +101,8 @@ function matCSS(m) {
         case MAT.LAVA: return '#dc5010'; case MAT.ACID: return '#32d232';
         case MAT.DIRT: return '#644628'; case MAT.GLASS: return '#c8dcf0';
         case MAT.ICE: return '#b4d2f0'; case MAT.FIRE: return '#ff6a00';
-        case MAT.EMBER: return '#c85a00'; default: return '#444';
+        case MAT.EMBER: return '#c85a00'; case MAT.METAL: return '#a0a0af';
+        case MAT.ELECTRICITY: return '#64c8ff'; default: return '#444';
     }
 }
 
@@ -154,6 +160,7 @@ function setCell(i, mat) {
     else if (mat === MAT.STEAM) life[i] = 120 + (rng()*100|0);
     else if (mat === MAT.SMOKE) life[i] = 80 + (rng()*60|0);
     else if (mat === MAT.EMBER) life[i] = 30 + (rng()*40|0);
+    else if (mat === MAT.ELECTRICITY) life[i] = 5 + (rng()*10|0);
     else life[i] = 0;
 }
 function swap(a, b) {
@@ -227,18 +234,20 @@ function simGas(x, y, i, m) {
 
 function simInteract(x, y, i, m) {
     // Lifetime-based materials
-    if (m === MAT.FIRE || m === MAT.STEAM || m === MAT.SMOKE || m === MAT.EMBER) {
+    if (m === MAT.FIRE || m === MAT.STEAM || m === MAT.SMOKE || m === MAT.EMBER || m === MAT.ELECTRICITY) {
         life[i]--;
         if (life[i] <= 0) {
             if (m === MAT.FIRE) setCell(i, rng()<0.25 ? MAT.SMOKE : MAT.EMPTY);
             else if (m === MAT.STEAM) setCell(i, rng()<0.35 ? MAT.WATER : MAT.EMPTY);
             else if (m === MAT.EMBER) setCell(i, MAT.EMPTY);
+            else if (m === MAT.ELECTRICITY) setCell(i, MAT.EMPTY);
             else setCell(i, MAT.EMPTY);
             return;
         }
-        // Fire flicker color
+        // Flicker color
         if (m === MAT.FIRE) color[i] = matColor(MAT.FIRE);
         if (m === MAT.EMBER) color[i] = matColor(MAT.EMBER);
+        if (m === MAT.ELECTRICITY) color[i] = matColor(MAT.ELECTRICITY);
     }
 
     // Check neighbors for reactions
@@ -273,6 +282,16 @@ function simInteract(x, y, i, m) {
         if (m === MAT.GUNPOWDER && (nm === MAT.FIRE || nm === MAT.LAVA || nm === MAT.EMBER)) {
             explode(x, y, 10 + (rng()*6|0));
             return;
+        }
+        // ELECTRICITY CONDUCTIVITY
+        if (m === MAT.ELECTRICITY && clock[ni] !== frameClock) {
+            if (nm === MAT.WATER || nm === MAT.METAL) {
+                if (rng() < 0.7) {
+                    setCell(ni, MAT.ELECTRICITY);
+                    life[ni] = 4 + (rng() * 8 | 0);
+                    clock[ni] = frameClock;
+                }
+            }
         }
     }
 }

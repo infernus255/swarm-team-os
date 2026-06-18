@@ -11,13 +11,13 @@ sys.path.append(os.getcwd())
 from core.config import settings
 from core.services.memory_service import MemoryService
 from core.orchestrator import GraphRunner
-from core.engine_selector import EngineSelector
+from core.poly_swarm_coordinator import PolySwarmCoordinator
 
 class JarvisAssistant:
     def __init__(self, memory_service: MemoryService):
         self.memory = memory_service
         self.swarm_runner = GraphRunner()
-        self.engine_selector = EngineSelector(settings.repo_root)
+        self.coordinator = PolySwarmCoordinator(settings.repo_root)
         self._check_version()
 
     def _check_version(self):
@@ -56,9 +56,8 @@ class JarvisAssistant:
         await self._auto_maintenance()
         
         # Decision Logic
-        if any(keyword in prompt.lower() for keyword in ["crear", "app", "swarm"]):
-            engine = await self.engine_selector.select_engine(prompt)
-            result = await self.engine_selector.execute_engine(engine, prompt)
+        if any(keyword in prompt.lower() for keyword in ["crear", "app", "swarm", "proyecto"]):
+            result = await self.coordinator.execute_task(prompt)
         else:
             result = {"status": "SUCCESS", "details": f"OS task '{prompt}' completed."}
 
@@ -106,8 +105,13 @@ class JarvisAssistant:
 
     async def _learn(self, prompt: str, result: dict):
         insight = f"Interaction: {prompt} | Result: {result.get('status')} | StunReachable: {result.get('diagnostics', {}).get('webrtc_stun_reachable', True)}"
-        self.memory.push_memory("GLOBAL_JARVIS", "REFLECTION", insight, {"input": prompt, "diagnostics": result.get("diagnostics")})
-        print("[Memory] [Jarvis] Memory persisted.")
+        self.memory.push_memory(
+            project_id="GLOBAL_JARVIS", 
+            phase="REFLECTION", 
+            content=insight, 
+            metadata={"input": prompt, "diagnostics": result.get("diagnostics"), "domain": "swarm"}
+        )
+        print("[Memory] [Jarvis] Memory persisted with domain 'swarm'.")
 
 if __name__ == "__main__":
     mem = MemoryService()
