@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Swarm Jump EXTREME - Optimized</title>
+    <style>
+        body { margin: 0; overflow: hidden; background: #0a0a2e; font-family: sans-serif; }
+        canvas { display: block; touch-action: none; }
+        #ui { 
+            position: absolute; top: 15px; width: 100%; display: flex; justify-content: space-around;
+            color: white; font-size: 22px; pointer-events: none; text-shadow: 2px 2px 0px #000;
+        }
+        .stat { background: rgba(0,0,0,0.6); padding: 4px 15px; border-radius: 20px; border: 2px solid #00ffcc; }
+    </style>
+</head>
+<body>
+    <div id="ui">
+        <div class="stat">BITS: <span id="score">1</span></div>
+        <div class="stat">🪙 <span id="coins">0</span></div>
+    </div>
+    <canvas id="gameCanvas"></canvas>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d', { alpha: false }); // Optimizacion: desactivar alpha en canvas principal
+        const scoreEl = document.getElementById('score');
+        const coinsEl = document.getElementById('coins');
+
+        let width, height;
+        let swarm = [];
+        let playerX = 0;
+        let targetX = 0;
+        let speed = 7;
+        let distance = 0;
+        let gates = [];
+        let coins = 0;
+        let particles = [];
+        const MAX_SWARM = 200; // Cap para evitar lag masivo
+
+        function init() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+            playerX = width / 2;
+            targetX = playerX;
+            resetSwarm(1);
+            spawnGate();
+        }
+
+        function resetSwarm(size) {
+            const newSize = Math.min(size, MAX_SWARM);
+            if (swarm.length === newSize) return;
+            
+            swarm = [];
+            for (let i = 0; i < newSize; i++) {
+                swarm.push({
+                    offX: (Math.random() - 0.5) * 70,
+                    offY: (Math.random() - 0.5) * 70,
+                    color: `hsl(${180 + Math.random() * 40}, 100%, 60%)`
+                });
+            }
+            scoreEl.innerText = size; // Mostramos el numero real aunque visualmente capeemos
+        }
+
+        function spawnGate() {
+            const isBlue = Math.random() > 0.3;
+            gates.push({
+                x: Math.random() * (width - 160),
+                y: -100,
+                w: 160,
+                h: 60,
+                type: isBlue ? 'MUL' : 'SUB',
+                value: isBlue ? 2 : 10,
+                color: isBlue ? '#00f2ff' : '#ff0055'
+            });
+        }
+
+        function update() {
+            distance += speed;
+            playerX += (targetX - playerX) * 0.15;
+
+            for (let i = gates.length - 1; i >= 0; i--) {
+                const g = gates[i];
+                g.y += speed;
+                if (g.y > height - 150 && g.y < height - 90) {
+                    if (playerX > g.x && playerX < g.x + g.w) {
+                        applyGate(g);
+                        gates.splice(i, 1);
+                        continue;
+                    }
+                }
+                if (g.y > height) gates.splice(i, 1);
+            }
+
+            if (distance % 180 === 0) spawnGate();
+            draw();
+            requestAnimationFrame(update);
+        }
+
+        function applyGate(gate) {
+            let nextSize = gate.type === 'MUL' ? swarm.length * gate.value : swarm.length - gate.value;
+            resetSwarm(Math.max(1, nextSize));
+            if (gate.type === 'MUL') coins += 5;
+            coinsEl.innerText = coins;
+        }
+
+        function draw() {
+            // Fondo sólido es más rápido que gradientes dinámicos
+            ctx.fillStyle = '#0a0a2e';
+            ctx.fillRect(0, 0, width, height);
+
+            // Gates: Sin shadowBlur (es el mayor asesino de FPS en móvil)
+            gates.forEach(g => {
+                ctx.fillStyle = g.color;
+                ctx.fillRect(g.x, g.y, g.w, g.h);
+                ctx.fillStyle = '#fff';
+                ctx.font = 'bold 24px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText(g.type === 'MUL' ? `x${g.value}` : `-${g.value}`, g.x + g.w/2, g.y + 40);
+            });
+
+            // Swarm: Usar un solo color por frame para batching manual
+            ctx.fillStyle = '#00ffcc';
+            swarm.forEach(b => {
+                ctx.fillRect(playerX + b.offX, height - 120 + b.offY, 6, 6);
+            });
+        }
+
+        canvas.addEventListener('mousemove', e => targetX = e.clientX);
+        canvas.addEventListener('touchstart', e => targetX = e.touches[0].clientX);
+        canvas.addEventListener('touchmove', e => {
+            targetX = e.touches[0].clientX;
+            e.preventDefault();
+        }, { passive: false });
+
+        window.addEventListener('resize', init);
+        init();
+        update();
+    </script>
+</body>
+</html>
