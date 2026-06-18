@@ -53,12 +53,21 @@ class M6DeployOutput(BaseModel):
     deployment_notes: str = ""
 
 
+class M4bBenchmarkResult(BaseModel):
+    execution_time_ms: float
+    memory_usage_kb: float
+    throughput: float
+    bottlenecks: List[str] = Field(default_factory=list)
+    recommendations: List[str] = Field(default_factory=list)
+
+
 AgentResult = (
     M0Manifest
     | M1Tdp
     | M2Bsp
     | M3Architecture
     | M4QaPlan
+    | M4bBenchmarkResult
     | M5CodeOutput
     | M6DeployOutput
 )

@@ -34,8 +34,8 @@ def init(
     # Escribir memoria inicial
     (result_dir / "MEMORY.md").write_text("# Memoria Histórica del Proyecto\n\n- Proyecto inicializado exitosamente.", encoding="utf-8")
     
-    print(f"[✓] Estructura creada en {settings.result_dir}")
-    print("[✓] Manifiesto del proyecto y MEMORY.md creados con éxito.")
+    print(f"[*] Estructura creada en {settings.result_dir}")
+    print("[*] Manifiesto del proyecto y MEMORY.md creados con exito.")
 
 
 @cli.command()
@@ -57,13 +57,13 @@ def run(
                 if res['status'] != "DONE":
                     print(f"[❌] Error en {agent}. Deteniendo Autorunner.")
                     break
-            print("\n[✓] Proyecto finalizado por el Swarm Autónomo.")
+            print("\n[*] Proyecto finalizado por el Swarm Autónomo.")
         else:
             print(f"[*] Iniciando modo HITL para {agent_id}...")
             res = await orchestrator.run_agent(agent_id, prompt)
-            print(f"[✓] Resultados de ejecución: {res['status']}")
+            print(f"[*] Resultados de ejecución: {res['status']}")
             if "action_required" in res:
-                print(f"[⚠️] Atención: {res['action_required']}")
+                print(f"[!] Atención: {res['action_required']}")
                 print(f"Prompt a correr manualmente:\n{res['prompt_to_run']}")
             print("\n[?] ¿Aprobado? (Y/N/Feedback) - El humano debe validar antes de avanzar.")
             

@@ -28,6 +28,7 @@ def build_all_agents() -> None:
     from app.agents.m2_business_analyst import m2_agent
     from app.agents.m3_architect import m3_agent
     from app.agents.m4_qa_engineer import m4_agent
+    from app.agents.m4b_benchmarker import m4b_agent
     from app.agents.m5_code_generator import m5_agent
     from app.agents.m6_devops import m6_agent
 
@@ -36,5 +37,6 @@ def build_all_agents() -> None:
     register("M2", m2_agent)
     register("M3", m3_agent)
     register("M4", m4_agent)
+    register("M4b", m4b_agent)
     register("M5", m5_agent)
     register("M6", m6_agent)

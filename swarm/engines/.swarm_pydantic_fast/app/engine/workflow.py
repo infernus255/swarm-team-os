@@ -4,8 +4,8 @@ from typing import Dict, List, Optional
 
 from app.models.state import Phase, Status
 
-GREENFIELD_DAG: List[str] = ["M0", "M1", "M2", "M3", "M4", "M5", "M6"]
-BROWNFIELD_DAG: List[str] = ["M1", "M2", "M3", "M4", "M5", "M6"]
+GREENFIELD_DAG: List[str] = ["M0", "M1", "M2", "M3", "M4", "M4b", "M5", "M6"]
+BROWNFIELD_DAG: List[str] = ["M1", "M2", "M3", "M4", "M4b", "M5", "M6"]
 
 PHASE_MAP: Dict[str, Phase] = {
     "M0": Phase.M0_FOUNDATION,
@@ -13,6 +13,7 @@ PHASE_MAP: Dict[str, Phase] = {
     "M2": Phase.M2_BSP,
     "M3": Phase.M3_ARCHITECTURE,
     "M4": Phase.M4_QA,
+    "M4b": Phase.M4b_BENCHMARK,
     "M5": Phase.M5_CODE,
     "M6": Phase.M6_DEVOPS,
 }

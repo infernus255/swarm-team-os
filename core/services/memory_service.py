@@ -128,7 +128,7 @@ class MemoryService:
                     """, (embedding, limit))
                 else:
                     cur.execute("""
-                        SELECT content FROM sga_l1_swarm_knowledge 
+                        SELECT content FROM sga_l0_context 
                         WHERE content ILIKE %s ORDER BY created_at DESC LIMIT %s;
                     """, (f"%{query}%", limit))
                 

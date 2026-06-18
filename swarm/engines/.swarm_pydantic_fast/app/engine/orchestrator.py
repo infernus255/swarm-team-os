@@ -101,13 +101,6 @@ class SwarmOrchestrator:
 
     # ── Agent Execution ────────────────────────────────────────────
 
-    def _load_shared_foundations(self) -> str:
-        """Carga el conocimiento global del swarm si existe."""
-        foundations_path = Path(__file__).resolve().parent.parent.parent / "swarn_templates" / "memory" / "SHARED_FOUNDATIONS.md"
-        if foundations_path.exists():
-            return foundations_path.read_text(encoding="utf-8")
-        return ""
-
     async def run_agent(self, agent_id: str, prompt: str = "") -> Dict[str, Any]:
         from app.agents.registry import get_agent
 
@@ -119,19 +112,32 @@ class SwarmOrchestrator:
             raise ValueError(f"Unknown agent: {agent_id}")
 
         memory_context = memory.get_recent()
-        foundations = self._load_shared_foundations()
+        # Dynamically query SGA for foundations
+        foundations = memory.query_global(query="architectural standards", limit=3)
 
         # Construct a comprehensive prompt enclosing global learnings and local memories
         full_prompt = ""
         if foundations:
             full_prompt += f"--- GLOBAL SWARM LEARNINGS (SGA) ---\n{foundations}\n\n"
-        full_prompt += f"--- LOCAL PROJECT MEMORIES ---\nProject Goal: {self.state.project_goal}\nRecent Memory:\n{memory_context}\n\n"
+        full_prompt += f"--- LOCAL PROJECT MEMORIES ---\nProject ID: {self.state.project_id}\nProject Goal: {self.state.project_goal}\nRecent Memory:\n{memory_context}\n\n"
         full_prompt += f"--- CURRENT REQUIREMENT ---\n{prompt}"
 
         try:
             result = await agent.run(full_prompt, deps=self.state)
 
             self.state.status = Status.DONE
+            
+            # Persist successful step to SGA
+            memory.update(
+                project_id=self.state.project_id,
+                phase=agent_id,
+                bullet_points=[
+                    f"Status: {self.state.status}",
+                    f"Result Summary: {str(result.data)[:100]}...",
+                    f"Timestamp: {datetime.now(timezone.utc).isoformat()}"
+                ]
+            )
+
             val_result = validator.validate_artifacts(agent_id, self.state)
             if not val_result:
                 self.state.errors_encountered.append(

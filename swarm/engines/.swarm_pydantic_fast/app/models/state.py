@@ -12,6 +12,7 @@ class Phase(str, Enum):
     M2_BSP = "M2_BSP"
     M3_ARCHITECTURE = "M3_ARCHITECTURE"
     M4_QA = "M4_QA"
+    M4b_BENCHMARK = "M4b_BENCHMARK"
     M5_CODE = "M5_CODE"
     M6_DEVOPS = "M6_DEVOPS"
     COMPLETED = "COMPLETED"

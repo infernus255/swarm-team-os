@@ -1,0 +1,20 @@
+{
+  "name": "mobile-game-base-setup",
+  "version": "1.0.0",
+  "description": "Distributed Agentic OS for Multi-Node Swarms (Poly-Swarm). Optimized for 2026 Agentic Engineering standards, featuring centralized memory alignment (SGA) and autonomous self-improvement.",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs",
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "playwright": "^1.61.0"
+  }
+}

@@ -120,7 +120,7 @@ class SwarmOrchestrator:
         with open(self.memory_file, "a", encoding="utf-8") as f:
             f.write(memory_entry)
         
-        print(f"[✓] Memoria del proyecto actualizada automáticamente para {agent_id}.")
+        print(f"[*] Memoria del proyecto actualizada automáticamente para {agent_id}.")
 
     # ── 4. Anti-Drift Spec Validation ─────────────────────────────
     def check_spec_drift(self) -> bool:
@@ -132,7 +132,7 @@ class SwarmOrchestrator:
             return True # No hay especificaciones o código aún para validar
             
         if not domain_val_file.exists():
-            print("[❌] Drift Detectado: Falta la Validación de Dominio (M2.5) en app_result/bsp/DOMAIN_VALIDATION.md")
+            print("[X] Drift Detectado: Falta la Validación de Dominio (M2.5) en app_result/bsp/DOMAIN_VALIDATION.md")
             return False
 
         # Aquí un agente de validación estática o el orquestador escanea src/ y BSP.md
@@ -149,5 +149,5 @@ class SwarmOrchestrator:
 
     def _mock_run(self, agent_id: str, prompt: str, model: str) -> str:
         foundations = self._load_shared_foundations()
-        foundations_msg = " [✓] Shared Foundations inyectadas en contexto." if foundations else ""
+        foundations_msg = " [*] Shared Foundations inyectadas en contexto." if foundations else ""
         return f"Output simulado para {agent_id} con modelo {model}.{foundations_msg}\n\n### Key Decisions\n- Decisión 1: Estructurado de clases usando decoradores de Antigravity.\n- Decisión 2: Separación estricta de app_result/src."
