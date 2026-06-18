@@ -1,29 +1,62 @@
-# 🗺️ REPO MAP ELITE (v3.0)
+# 🗺️ REPO MAP (v4.0)
 
+```
 .
+├── .agents/
+│   └── AGENTS.md                 # Universal AI bootstrap (READ THIS FIRST)
 ├── config/
-│   ├── api_orchestrator.json     # Ruteo inteligente de LLMs
-│   └── api_budget.json           # Límites de gasto (FinOps)
+│   ├── api_orchestrator.json     # LLM routing configuration
+│   └── api_budget.json           # Token spending limits (FinOps)
 ├── core/
-│   ├── orchestrator.py           # Brain (GraphRunner + SGA Sync)
-│   ├── engine_selector.py        # Dispatcher de Motores Poly-Swarm
-│   ├── graph.py                  # Definición de Nodos del Grafo
+│   ├── config.py                 # Settings, env loading, model tiers
+│   ├── orchestrator.py           # GraphRunner (task execution graph)
+│   ├── poly_swarm_coordinator.py # Multi-engine task dispatcher
+│   ├── engine_selector.py        # LLM-powered engine routing
+│   ├── graph.py                  # Node definitions for execution graph
 │   └── services/
-│       └── memory_service.py     # Conector Neon DB (L0/L1)
+│       ├── memory_service.py     # Neon DB connector (L0/L1 SGA)
+│       └── node_service.py       # Node registration & auditing
 ├── docs/
-│   ├── architecture_insights.md  # La Biblia Agéntica (Guru-Watch)
-│   └── ...                       # Handoffs y Guías
+│   ├── architecture_insights.md  # Guru-Watch knowledge base
+│   ├── copilot-instructions.md   # AI coding rules
+│   └── ...                       # Handoffs & plans
+├── env_drivers/
+│   ├── base_driver.py            # Abstract driver interface
+│   ├── codespaces_cloud.py       # GitHub Codespaces adapter
+│   ├── local_desktop.py          # Local dev machine adapter
+│   └── pentium_mayordomo.py      # Pentium server adapter
 ├── harness/
+│   ├── README.md                 # Skills documentation & troubleshooting
+│   ├── collectors/
+│   │   └── base.py               # Git & System data collectors
+│   ├── docs/
+│   │   └── COPILOT_SKILL.md      # AI-agnostic skill reference
 │   └── scripts/
-│       ├── skill_guru_watch.py   # Auto-update de conocimiento
-│       ├── skill_state.py        # Telemetría de hardware
-│       └── ...                   # Skills Git/Docker
+│       ├── skill_state.py        # Environment telemetry → state.json
+│       ├── skill_memory.py       # Learning entries → memory.md
+│       ├── skill_plan.py         # State → install plan update
+│       ├── skill_docker.py       # State → Dockerfile sync
+│       ├── skill_commit_push.py  # Validated git commit + push
+│       ├── skill_env_control.py  # Portable env discovery
+│       ├── skill_node_manager.py # Node audit CLI
+│       ├── skill_obs_dashboard.py # Live SGA dashboard
+│       ├── skill_guru_watch.py   # Upstream knowledge fetcher
+│       └── utils/
+│           └── state_loader.py   # Shared state I/O + file locking
 ├── infra/
-│   ├── universal-setup.sh        # Instalador agnóstico
-│   └── db_init.py                # Inicializador SGA
+│   ├── universal-setup.sh        # Cross-platform dependency installer
+│   └── db_init.py                # SGA database initializer
 ├── memory/
-│   └── sga_client.py             # Proxy de memoria core
+│   └── sga_client.py             # Memory proxy for external clients
 ├── swarm/
-│   ├── engines/                  # Workforce (Motores especializados)
-│   └── blueprints/               # Master Prompts (v3.0)
-└── tests/                        # Regression Control Suite
+│   ├── engines/                  # Specialized execution engines
+│   └── blueprints/               # Master prompts for M0-M6 agents
+├── tests/                        # Regression test suite
+├── jarvis.py                     # Main Jarvis dispatcher
+├── MASTER_HANDOFF.md             # Architecture & node topology
+├── NEXT_HANDOFF.md               # Roadmap & next steps
+├── AI_AUTORUNNER_PROMPT.md       # Copy-paste bootstrap for new AI sessions
+├── VERSION                       # Current OS version
+├── .clinerules                   # AI coding standards
+└── .roomodes                     # Swarm agent role definitions
+```

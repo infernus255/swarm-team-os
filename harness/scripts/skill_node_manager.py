@@ -1,3 +1,7 @@
+"""Harness Skill: Node Manager.
+Deterministic CLI tool for node registration, dependency auditing, and config validation.
+Usage: python harness/scripts/skill_node_manager.py {info|register|check}
+"""
 import argparse
 import sys
 import json
@@ -5,6 +9,12 @@ from pathlib import Path
 
 # Añadir el root al path para permitir importaciones core
 sys.path.append(str(Path(__file__).parent.parent.parent))
+
+if sys.stdout.encoding and sys.stdout.encoding.lower() != 'utf-8':
+    try:
+        sys.stdout.reconfigure(encoding='utf-8')
+    except Exception:
+        pass
 
 from core.services.node_service import NodeService
 

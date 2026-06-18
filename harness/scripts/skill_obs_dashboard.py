@@ -1,3 +1,8 @@
+"""Harness Skill: Observability Dashboard.
+Connects to Neon PostgreSQL (SGA) and displays real-time swarm node status, project states, and L1 knowledge.
+Requires: DATABASE_URL env var, psycopg2, python-dotenv.
+Usage: python harness/scripts/skill_obs_dashboard.py --mode {summary|nodes|projects|knowledge} [--limit N] [--domain {game|harness|swarm|system}]
+"""
 import argparse
 import sys
 import os
@@ -5,6 +10,12 @@ from pathlib import Path
 from datetime import datetime
 import psycopg2
 from dotenv import load_dotenv
+
+if sys.stdout.encoding and sys.stdout.encoding.lower() != 'utf-8':
+    try:
+        sys.stdout.reconfigure(encoding='utf-8')
+    except Exception:
+        pass
 
 # Path setup to include core
 sys.path.append(str(Path(__file__).parent.parent.parent))
@@ -17,9 +28,13 @@ DB_URL = os.getenv("DATABASE_URL")
 
 def get_conn():
     if not DB_URL:
-        print("❌ ERROR: DATABASE_URL not found in environment.")
-        sys.exit(1)
-    return psycopg2.connect(DB_URL)
+        print("[WARNING] DATABASE_URL not found in environment. Dashboard requires a database connection.")
+        return None
+    try:
+        return psycopg2.connect(DB_URL)
+    except Exception as e:
+        print(f"[WARNING] Could not connect to database: {e}")
+        return None
 
 def format_ts(ts):
     if not ts: return "N/A"
@@ -80,6 +95,9 @@ def run_dashboard():
     
     try:
         conn = get_conn()
+        if not conn:
+            print("[INFO] Dashboard requires DATABASE_URL. Set it in .env or hermes.env to use this skill.")
+            return
         cur = conn.cursor()
 
         if args.mode == "summary":

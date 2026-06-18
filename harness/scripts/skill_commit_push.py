@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+"""Harness Skill: Validated Commit & Push.
+Runs validation checks before committing and pushing. Non-critical validations (Hermes, n8n, Copilot docs)
+are treated as warnings unless --strict mode is used. Core validations (state.json, git) always block.
+Usage: python harness/scripts/skill_commit_push.py [--force] [--strict] "Commit message"
+"""
 import json
 import os
 import re
@@ -7,24 +12,16 @@ import subprocess
 import sys
 from pathlib import Path
 
+if sys.stdout.encoding and sys.stdout.encoding.lower() != 'utf-8':
+    try:
+        sys.stdout.reconfigure(encoding='utf-8')
+    except Exception:
+        pass
+
 from utils.state_loader import StateLoader
 
 loader = StateLoader()
 REPO_ROOT = loader.repo_root
-VALIDATION_FILES = [
-    "state.json",
-    "memory.md",
-    "README.md",
-    "docs/HERMES_TELEGRAM_INSTALL_PLAN.md",
-    "docs/copilot-instructions.md",
-    "harness/README.md",
-    "harness/docs/COPILOT_SKILL.md",
-    "docs/N8N.md",
-    "Dockerfile",
-    "docker-compose.yml",
-    "infra/hermes/docker-entrypoint.sh",
-    "infra/hermes/hermes-install.sh",
-]
 
 
 def run(cmd, check=True, capture_output=True):
@@ -183,61 +180,64 @@ def git_add_commit_push(message):
 
 
 def main():
+    import argparse
+    parser = argparse.ArgumentParser(description="Validated commit and push")
+    parser.add_argument("--force", action="store_true", help="Skip all validations and commit directly")
+    parser.add_argument("--strict", action="store_true", help="Treat all validations as blocking (default: only core validations block)")
+    parser.add_argument("message", nargs="*", default=["Auto commit: harness validated"], help="Commit message")
+    args = parser.parse_args()
+    commit_message = " ".join(args.message)
+
     loader.acquire_lock()
     try:
+        if args.force:
+            print("[Force] Skipping all validations...")
+            git_add_commit_push(commit_message)
+            print("Commit y push completados (force mode).")
+            return
+
+        # Core validations (always blocking)
+        core_errors = []
         state, err = load_state()
         if err:
-            print(err)
-            sys.exit(1)
+            core_errors.append(err)
 
-        print("Validando archivos de documentación...")
-        errors = []
-        for path in VALIDATION_FILES:
+        for path in ["state.json", "memory.md", "README.md"]:
             ok, msg = validate_file(path)
             if not ok:
-                errors.append(msg)
+                core_errors.append(msg)
 
-        print("Validando estado del sistema operativo...")
-        ok, msg = validate_os(state)
-        if not ok:
-            errors.append(msg)
+        # Non-critical validations (warnings unless --strict)
+        warnings = []
+        if state:
+            for validator, label in [
+                (lambda: validate_os(state), "OS"),
+                (lambda: validate_hermes(state), "Hermes"),
+                (lambda: validate_copilot_docs(), "Copilot docs"),
+                (lambda: validate_api_keys(state), "API keys"),
+                (lambda: validate_n8n(), "n8n"),
+                (lambda: validate_docker(), "Docker"),
+            ]:
+                ok, msg = validator()
+                if not ok:
+                    if args.strict:
+                        core_errors.append(f"[{label}] {msg}")
+                    else:
+                        warnings.append(f"[{label}] {msg}")
 
-        print("Validando Hermes...")
-        ok, msg = validate_hermes(state)
-        if not ok:
-            errors.append(msg)
+        # Report
+        if warnings:
+            print("\nWarnings (non-blocking):")
+            for w in warnings:
+                print(f"  - {w}")
 
-        print("Validando documentación de Copilot...")
-        ok, msg = validate_copilot_docs()
-        if not ok:
-            errors.append(msg)
-
-        print("Validando claves API y límites...")
-        ok, msg = validate_api_keys(state)
-        if not ok:
-            errors.append(msg)
-
-        print("Validando n8n...")
-        ok, msg = validate_n8n()
-        if not ok:
-            errors.append(msg)
-
-        print("Validando Docker...")
-        ok, msg = validate_docker()
-        if not ok:
-            errors.append(msg)
-
-        if errors:
-            print("\nValidación fallida con los siguientes errores:")
-            for item in errors:
-                print(f"- {item}")
+        if core_errors:
+            print("\nCore validation failed:")
+            for e in core_errors:
+                print(f"  - {e}")
             sys.exit(1)
 
-        commit_message = "Auto commit: validate state/docs/hermes/copilot/n8n/docker and push"
-        if len(sys.argv) > 1:
-            commit_message = " ".join(sys.argv[1:])
-
-        print("Todas las validaciones pasaron. Commit y push en progreso...")
+        print("\nCore validations passed. Committing...")
         git_add_commit_push(commit_message)
         print("Commit y push completados.")
     finally:

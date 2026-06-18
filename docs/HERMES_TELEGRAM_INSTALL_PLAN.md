@@ -259,38 +259,23 @@ hermes setup
 ## 10. Escalabilidad y replicabilidad
 
 <!-- STATE-BEGIN -->
-## 14. Estado actual y validaci├│n
+## 14. Estado actual y validación
 
 ### Entorno actual
-- Environment ID: DESKTOP-Q0NMPDE:host:hermes-telegram-isolated-env
+- Environment ID: DESKTOP-Q0NMPDE:host:swarm-team-os
 - Environment type: host
 
 ### Hermes
 - Instalado: True
-- Versi├│n: None
+- Versión: Hermes Agent v0.16.0 (2026.6.5) · upstream 210f4e70
 - Proveedor: gemini
 - Modelo por defecto: gemini-3.5-flash
 - Base URL: https://generativelanguage.googleapis.com/v1beta/openai
-- Gateway Telegram: telegram_not_configured
 
 ### Sistema operativo
 - Nombre: nt
-- Versi├│n: Unknown
-- Paquetes verificados:
+- Versión: 10.0.22000
 
-### API keys
-- Total de claves detectadas: 1
-- Proveedores: GEMINI
-  - primary (GEMINI): limit=1000000, source=GEMINI_API_KEY
-
-### Repositorio git
-- Rama: hermes-telegram-isolated-env
-- Commit: 8051c11193b92d97feba25f634bf31ce90b8c878
-- Mensaje: Validation check after fixing key limits
-- Cambios modificados: 6
-- Archivos no rastreados: 0
-- Ahead: 0
-- Behind: 0
 <!-- STATE-END -->
 
 <!-- AUTORUNNER-BEGIN -->

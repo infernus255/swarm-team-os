@@ -1,7 +1,18 @@
 #!/usr/bin/env python3
+"""Harness Skill: Plan Updater.
+Reads state.json and updates the install plan document with current environment state.
+Usage: python harness/scripts/skill_plan.py
+"""
 import json
+import sys
 from pathlib import Path
 from datetime import datetime
+
+if sys.stdout.encoding and sys.stdout.encoding.lower() != 'utf-8':
+    try:
+        sys.stdout.reconfigure(encoding='utf-8')
+    except Exception:
+        pass
 
 from utils.state_loader import StateLoader
 
@@ -112,6 +123,9 @@ def format_autorunner(state):
 
 
 def update_plan_file(state):
+    if not PLAN_FILE.exists():
+        print(f"[WARNING] Plan file not found: {PLAN_FILE}. Skipping plan update.")
+        return
     content = PLAN_FILE.read_text(encoding="utf-8")
     state_section = format_state(state)
     autorunner_section = format_autorunner(state)

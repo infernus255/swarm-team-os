@@ -1,10 +1,20 @@
 #!/usr/bin/env python3
+"""Harness Skill: Environment Control & Sync.
+Portable environment state collector that discovers system info, git status, and syncs the install plan.
+Usage: python harness/scripts/skill_env_control.py
+"""
 import os
 import sys
 import json
 import subprocess
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
+
+if sys.stdout.encoding and sys.stdout.encoding.lower() != 'utf-8':
+    try:
+        sys.stdout.reconfigure(encoding='utf-8')
+    except Exception:
+        pass
 
 sys.path.append(str(Path(__file__).resolve().parents[0]))
 from utils.state_loader import StateLoader
@@ -83,7 +93,7 @@ def main():
     else:
         env_node_id = env_id.split(":")[0]
     
-    timestamp = datetime.utcnow().isoformat() + "Z"
+    timestamp = datetime.now(timezone.utc).isoformat().replace('+00:00', 'Z')
     state["timestamp"] = timestamp
     state["current_environment_id"] = env_id
     if "environments" not in state:

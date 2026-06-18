@@ -1,26 +1,35 @@
 #!/usr/bin/env python3
+"""Harness Skill: AI Review Package Generator.
+Generates a markdown file listing key project files and review focus areas
+for handoff to another AI agent for code review.
+Usage: python harness/scripts/skill_generate_ai_review_package.py
+"""
 from datetime import datetime, timezone
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 OUTPUT_FILE = REPO_ROOT / "review_for_ai.md"
 REVIEW_FILES = [
+    ".agents/AGENTS.md",
     "README.md",
-    "copilot_improvements.md",
+    "MASTER_HANDOFF.md",
+    "NEXT_HANDOFF.md",
+    "repo_map.md",
     "docs/copilot-instructions.md",
-    "harness/docs/COPILOT_SKILL.md",
-    "docs/HERMES_TELEGRAM_INSTALL_PLAN.md",
-    "harness_evolution_blueprint.md",
     "harness/README.md",
+    "harness/docs/COPILOT_SKILL.md",
     "harness/scripts/skill_state.py",
     "harness/scripts/skill_plan.py",
     "harness/scripts/skill_docker.py",
     "harness/scripts/skill_commit_push.py",
     "harness/scripts/utils/state_loader.py",
+    "core/config.py",
+    "core/orchestrator.py",
+    "jarvis.py",
     "Dockerfile",
     "docker-compose.yml",
-    "api_budget.json",
 ]
+
 
 SUMMARY = (
     "Este archivo reúne las rutas y el propósito clave para que otra IA analice el repositorio.")
